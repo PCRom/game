@@ -47,17 +47,17 @@ local NoiseShapeSettings = {
 
 -- Sum of values determine raid level, values >= than HighValueCrop can summon tapebots and farmbots
 local Crops = {
-	[tostring(hvs_growing_banana)] = 2, [tostring(hvs_mature_banana)] = 2,
-	[tostring(hvs_growing_blueberry)] = 2, [tostring(hvs_mature_blueberry)] = 2,
-	[tostring(hvs_growing_eggplant)] = 2, [tostring(hvs_mature_eggplant)] = 2,
-	[tostring(hvs_growing_orange)] = 2, [tostring(hvs_mature_orange)] = 2,
-	[tostring(hvs_growing_pineapple)] = 3, [tostring(hvs_mature_pineapple)] = 3,
-	[tostring(hvs_growing_carrot)] = 1, [tostring(hvs_mature_carrot)] = 1,
-	[tostring(hvs_growing_redbeet)] = 1, [tostring(hvs_mature_redbeet)] = 1,
-	[tostring(hvs_growing_tomato)] = 1, [tostring(hvs_mature_tomato)] = 1,
-	[tostring(hvs_growing_broccoli)] = 3, [tostring(hvs_mature_broccoli)] = 3,
-	[tostring(hvs_growing_potato)] = 1.5, [tostring(hvs_mature_potato)] = 1.5,
-	[tostring(hvs_growing_cotton)] = 1.5, [tostring(hvs_mature_cotton)] = 1.5
+	[tostring(hvs_growing_banana)] = 0, [tostring(hvs_mature_banana)] = 0,
+	[tostring(hvs_growing_blueberry)] = 0, [tostring(hvs_mature_blueberry)] = 0,
+	[tostring(hvs_growing_eggplant)] = 0, [tostring(hvs_mature_eggplant)] = 0,
+	[tostring(hvs_growing_orange)] = 0, [tostring(hvs_mature_orange)] = 0,
+	[tostring(hvs_growing_pineapple)] = 0, [tostring(hvs_mature_pineapple)] = 0,
+	[tostring(hvs_growing_carrot)] = 0, [tostring(hvs_mature_carrot)] = 0,
+	[tostring(hvs_growing_redbeet)] = 0, [tostring(hvs_mature_redbeet)] = 0,
+	[tostring(hvs_growing_tomato)] = 0, [tostring(hvs_mature_tomato)] = 0,
+	[tostring(hvs_growing_broccoli)] = 0, [tostring(hvs_mature_broccoli)] = 0,
+	[tostring(hvs_growing_potato)] = 0, [tostring(hvs_mature_potato)] = 0,
+	[tostring(hvs_growing_cotton)] = 0, [tostring(hvs_mature_cotton)] = 0
 }
 
 local Raiders = {
