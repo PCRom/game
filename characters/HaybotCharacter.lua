@@ -5,7 +5,6 @@ HaybotCharacter = class( Character )
 
 local alertRenderableTp = "$SURVIVAL_DATA/Character/Char_Haybot/char_haybot_alert.rend"
 local roamingRenderableTp = "$SURVIVAL_DATA/Character/Char_Haybot/char_haybot_roaming.rend"
-sm.character.preloadRenderables( { alertRenderableTp, roamingRenderableTp } )
 
 local alertMovementEffects = "$SURVIVAL_DATA/Character/Char_Haybot/alert_movement_effects.json"
 local roamingMovementEffects = "$SURVIVAL_DATA/Character/Char_Haybot/alert_movement_effects.json"
@@ -128,7 +127,11 @@ function HaybotCharacter.cl_initAnimationSwitch( self )
 	self.cl.currentSwitch = ""
 end
 
+local UnitName = "Haybot"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_robotdetector.lua"
+
 function HaybotCharacter.client_onUpdate( self, deltaTime )
+	ShowUnitInfo( self, deltaTime, UnitName )
 	if not self.graphicsLoaded then
 		return
 	end

@@ -2,6 +2,8 @@
 dofile "$GAME_DATA/Scripts/game/AnimationUtil.lua"
 dofile "$SURVIVAL_DATA/Scripts/util.lua"
 
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+
 local Damage = 20
 
 Sledgehammer = class()
@@ -318,6 +320,20 @@ end
 --	character:setTumbling( not character:isTumbling() )
 --end
 
+function GetDamageData( self )
+	local ID = self.tool:getOwner():getId()
+	if ID then
+		if g_Players[ ID ] then
+			if g_Players[ ID ].damagebuff then
+				if g_Players[ ID ].damagebuff >= 1 then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
 function Sledgehammer.client_onEquippedUpdate( self, primaryState, secondaryState )
 	--HACK Enter/exit tumble state when hammering
 	--if primaryState == sm.tool.interactState.start then
@@ -335,7 +351,11 @@ function Sledgehammer.client_onEquippedUpdate( self, primaryState, secondaryStat
 			self.pendingRaycastFlag = false
 			local raycastStart = sm.localPlayer.getRaycastStart()
 			local direction = sm.localPlayer.getDirection()
-			sm.melee.meleeAttack( "Sledgehammer", Damage, raycastStart, direction * Range, self.tool:getOwner() )
+			local rel_Damage = Damage
+			if GetDamageData( self ) then
+				rel_Damage = rel_Damage * 2
+			end
+			sm.melee.meleeAttack( "Sledgehammer", rel_Damage, raycastStart, direction * Range, self.tool:getOwner() )
 			local success, result = sm.localPlayer.getRaycast( Range, raycastStart, direction )
 			if success then
 				self.freezeTimer = self.freezeDuration

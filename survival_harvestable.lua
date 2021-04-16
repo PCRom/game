@@ -24,6 +24,14 @@ hvs_mature_broccoli = sm.uuid.new( "b166b142-792a-4c8f-9d06-f277dab6dba6" )
 hvs_growing_cotton = sm.uuid.new( "779b5e09-7ce7-4a16-9817-02f5cb8e11f6" )
 hvs_mature_cotton = sm.uuid.new( "4d923a91-0c98-40f9-ae3f-ef386362ab1c" )
 
+
+-- 00Fant
+
+hvs_growing_eggplant = sm.uuid.new( "972eed5f-dfa0-4763-b2e9-f1ad50525356" )
+hvs_mature_eggplant = sm.uuid.new( "4b2507ef-8516-4c33-ab1a-9d4288d4514b" )
+
+
+
 -- Farmables
 hvs_farmables_beehive = sm.uuid.new( "7261bb49-9c63-4097-999a-4dcab9645eb0" )
 hvs_farmables_beehive_broken = sm.uuid.new( "3f1507bc-fc48-4b77-b87a-687cb1f4b787" )

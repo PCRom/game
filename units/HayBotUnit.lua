@@ -10,6 +10,14 @@ dofile "$SURVIVAL_DATA/Scripts/game/units/states/CombatAttackState.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/units/states/CircleFollowState.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_constants.lua"
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_tesla_coil.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/weapons/Fant_ElectroHammer/Fant_ElectroHammer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/character/straw_dog/fant_straw_dog.lua"
+dofile( "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua" )
+dofile( "$SURVIVAL_DATA/Scripts/game/survival_items.lua")
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_flamethrower.lua"
+
 HaybotUnit = class( nil )
 
 local WaterTumbleTickTime = 3.0 * 40
@@ -123,7 +131,7 @@ function HaybotUnit.server_onCreate( self )
 	self.attackState01 = self.unit:createState( "meleeAttack" )
 	self.attackState01.meleeType = "HaybotPitchforkSwipe"
 	self.attackState01.event = "attack01"
-	self.attackState01.damage = 30
+	self.attackState01.damage = 10
 	self.attackState01.attackRange = 1.75
 	self.attackState01.animationCooldown = 1.65 * 40
 	self.attackState01.attackCooldown = 0.25 * 40
@@ -133,7 +141,7 @@ function HaybotUnit.server_onCreate( self )
 	self.attackState02 = self.unit:createState( "meleeAttack" )
 	self.attackState02.meleeType = "HaybotPitchfork"
 	self.attackState02.event = "attack02"
-	self.attackState02.damage = 20
+	self.attackState02.damage = 15
 	self.attackState02.attackRange = 1.75
 	self.attackState02.animationCooldown = 0.825 * 40
 	self.attackState02.attackCooldown = 2.0 * 40
@@ -143,7 +151,7 @@ function HaybotUnit.server_onCreate( self )
 	self.attackState03 = self.unit:createState( "meleeAttack" )
 	self.attackState03.meleeType = "HaybotPitchfork"
 	self.attackState03.event = "attack03"
-	self.attackState03.damage = 20
+	self.attackState03.damage = 15
 	self.attackState03.attackRange = 1.75
 	self.attackState03.animationCooldown = 0.925 * 40
 	self.attackState03.attackCooldown = 2.0 * 40
@@ -153,7 +161,7 @@ function HaybotUnit.server_onCreate( self )
 	self.attackStateSprint01 = self.unit:createState( "meleeAttack" )
 	self.attackStateSprint01.meleeType = "HaybotPitchfork"
 	self.attackStateSprint01.event = "sprintattack01"
-	self.attackStateSprint01.damage = 20
+	self.attackStateSprint01.damage = 15
 	self.attackStateSprint01.attackRange = 1.75
 	self.attackStateSprint01.animationCooldown = 0.8 * 40
 	self.attackStateSprint01.attackCooldown = 3.0 * 40
@@ -244,6 +252,11 @@ function HaybotUnit.server_onCreate( self )
 	self.currentState = self.idleState
 	self.currentState:start()
 	
+	--00Fant
+	if isSurvival then
+		SpawnStraw_dog( self )
+	end
+	
 end
 
 function HaybotUnit.server_onRefresh( self )
@@ -255,6 +268,9 @@ function HaybotUnit.server_onDestroy( self )
 end
 
 function HaybotUnit.server_onFixedUpdate( self, dt )
+	ProcessTeslaDamage( self, false )
+	FlamethrowerDamage( self, dt )
+	
 	if sm.exists( self.unit ) and not self.destroyed then
 		if self.saved.deathTickTimestamp and sm.game.getCurrentTick() >= self.saved.deathTickTimestamp then
 			self.unit:destroy()
@@ -384,7 +400,7 @@ function HaybotUnit.server_onUnitUpdate( self, dt )
 	local closestVisibleWormCharacter
 	local closestVisibleCrop
 	local closestVisibleTeamOpponent
-	if not SurvivalGame then
+	if not isSurvival then
 		closestVisibleTeamOpponent = sm.ai.getClosestVisibleTeamOpponent( self.unit, self.unit.character:getColor() )
 	end
 	closestVisiblePlayerCharacter = sm.ai.getClosestVisiblePlayerCharacter( self.unit )
@@ -412,7 +428,7 @@ function HaybotUnit.server_onUnitUpdate( self, dt )
 		if sm.exists( allyUnit ) and self.unit ~= allyUnit and allyUnit.character and isAnyOf( allyUnit.character:getCharacterType(), g_robots ) and InSameWorld( self.unit, allyUnit) then
 			if ( allyUnit.character.worldPosition - self.unit.character.worldPosition ):length() <= AllyRange then
 				local sameTeam = true
-				if not SurvivalGame then
+				if not isSurvival then
 					sameTeam = InSameTeam( allyUnit, self.unit )
 				end
 				if sameTeam then
@@ -442,7 +458,7 @@ function HaybotUnit.server_onUnitUpdate( self, dt )
 			if sm.exists( allyUnit ) and self.unit ~= allyUnit and allyUnit.character and isAnyOf( allyUnit.character:getCharacterType(), g_robots ) and InSameWorld( self.unit, allyUnit) then
 				if ( allyUnit.character.worldPosition - self.unit.character.worldPosition ):length() <= AllyRange then
 					local sameTeam = true
-					if not SurvivalGame then
+					if not isSurvival then
 						sameTeam = InSameTeam( allyUnit, self.unit )
 					end
 					if sameTeam then
@@ -847,9 +863,13 @@ function HaybotUnit.server_onProjectile( self, hitPos, hitTime, hitVelocity, pro
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	
+	if projectileName == "water" then
+		ExtinguishFire( self )
+	end
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -880,9 +900,10 @@ function HaybotUnit.server_onMelee( self, hitPos, attacker, damage )
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	GetMeleeHit( self, attacker )
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -921,7 +942,7 @@ function HaybotUnit.server_onCollision( self, other, collisionPosition, selfPoin
 			return
 		end
 		local teamOpponent = false
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( other, self.unit )
 		end
 		if other:isPlayer() or teamOpponent then
@@ -960,11 +981,11 @@ function HaybotUnit.server_onCollision( self, other, collisionPosition, selfPoin
 		self:sv_takeDamage( damage, collisionNormal, collisionPosition )
 	end
 	if tumbleTicks > 0 then
-		if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
-			if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
-				sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
-			end
-		end
+		-- if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
+			-- if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
+				-- sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
+			-- end
+		-- end
 	end
 	
 end
@@ -1039,7 +1060,7 @@ function HaybotUnit.sv_onDeath( self, impact )
 		print("'HaybotUnit' killed!")
 		self.unit:sendCharacterEvent( "explode" )
 		self:sv_spawnParts( impact )
-		if SurvivalGame then
+		if isSurvival then
 			local loot = SelectLoot( "loot_haybot" )
 			SpawnLoot( self.unit, loot )
 		end
@@ -1092,7 +1113,7 @@ function HaybotUnit.sv_e_receiveTarget( self, params )
 	if self.unit ~= params.unit then
 		if self.eventTarget == nil then
 			local sameTeam = false
-			if not SurvivalGame then
+			if not isSurvival then
 				sameTeam = InSameTeam( params.targetCharacter, self.unit )
 			end
 			if not sameTeam then
@@ -1108,6 +1129,8 @@ function HaybotUnit.sv_e_allyDamaged( self, params )
 	end
 end
 
-function HaybotUnit.sv_e_onEnterWater( self ) end
+function HaybotUnit.sv_e_onEnterWater( self )
+	ExtinguishFire( self )
+end
 
 function HaybotUnit.sv_e_onStayWater( self ) end

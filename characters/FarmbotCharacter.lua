@@ -5,7 +5,6 @@ FarmbotCharacter = class( Character )
 
 local alertRenderableTp = "$SURVIVAL_DATA/Character/Char_Farmbot/char_farmbot_alert.rend"
 local roamingRenderableTp = "$SURVIVAL_DATA/Character/Char_Farmbot/char_farmbot_roaming.rend"
-sm.character.preloadRenderables( { alertRenderableTp, roamingRenderableTp } )
 
 local alertMovementEffects = "$SURVIVAL_DATA/Character/Char_Farmbot/alert_movement_effects.json"
 local roamingMovementEffects = "$SURVIVAL_DATA/Character/Char_Farmbot/roaming_movement_effects.json"
@@ -167,7 +166,14 @@ function FarmbotCharacter.cl_initAnimationSwitch( self )
 	self.cl.currentSwitch = ""
 end
 
+
+local UnitName = "Farmbot"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_robotdetector.lua"
+
+
 function FarmbotCharacter.client_onUpdate( self, deltaTime )
+	ShowUnitInfo( self, deltaTime, UnitName )
+	
 	if not self.graphicsLoaded then
 		return
 	end

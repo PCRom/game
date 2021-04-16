@@ -1,14 +1,21 @@
 -- HarvestableSoil.lua --
 dofile "$SURVIVAL_DATA/Scripts/game/survival_harvestable.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_shapes.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua"
 
 HarvestableSoil = class( nil )
 HarvestableSoil.SoilFrames = 10
 HarvestableSoil.WaterRetentionTickTime = 40 * DAYCYCLE_TIME * 1.5
 HarvestableSoil.TimeStep = 0.025
 
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function HarvestableSoil.server_onDestroy( self )
+	g_remove_Empty_Soil( self )
+end
 -- Server
 function HarvestableSoil.server_onCreate( self )
+	g_add_Empty_Soil( self )
 	
 	self.sv = self.storage:load()
 	if self.sv == nil then
@@ -19,10 +26,10 @@ function HarvestableSoil.server_onCreate( self )
 	end
 	if self.params then
 		if self.params.waterTicks then
-			self.sv.waterTicks = self.params.waterTicks
+			self.sv.waterTicks = 0--self.params.waterTicks
 		end
 		if self.params.fertilizer then
-			self.sv.fertilizer = self.params.fertilizer
+			self.sv.fertilizer = 0--self.params.fertilizer
 		end
 	end
 	
@@ -67,11 +74,15 @@ end
 
 function HarvestableSoil.sv_e_plant( self, params )
 	if not self.sv.planted and sm.exists( self.harvestable ) then
-		if sm.container.beginTransaction() then
-			sm.container.spendFromSlot( params.playerInventory, params.slot, params.plantableUuid, 1, true )
-			if sm.container.endTransaction() then
-				self:sv_plant( { plantedHarvestableUuid = params.plantedHarvestableUuid } )
+		if sm.game.getLimitedInventory() then
+			if sm.container.beginTransaction() then
+				sm.container.spendFromSlot( params.playerInventory, params.slot, params.plantableUuid, 1, true )
+				if sm.container.endTransaction() then
+					self:sv_plant( { plantedHarvestableUuid = params.plantedHarvestableUuid } )
+				end
 			end
+		else
+			self:sv_plant( { plantedHarvestableUuid = params.plantedHarvestableUuid } )
 		end
 	end
 end
@@ -88,13 +99,19 @@ end
 
 function HarvestableSoil.sv_e_fertilize( self, params )
 	if not self.sv.fertilizer then
-		if sm.container.beginTransaction() then
-			sm.container.spendFromSlot( params.playerInventory, params.slot, obj_consumable_fertilizer, 1, true )
-			if sm.container.endTransaction() then
-				self:sv_performUpdate() -- Catch up to current time
-				self.sv.fertilizer = true
-				self:sv_performUpdate() -- Save and synch fertilizer
+		if sm.game.getLimitedInventory() then
+			if sm.container.beginTransaction() then
+				sm.container.spendFromSlot( params.playerInventory, params.slot, obj_consumable_fertilizer, 1, true )
+				if sm.container.endTransaction() then
+					self:sv_performUpdate() -- Catch up to current time
+					self.sv.fertilizer = true
+					self:sv_performUpdate() -- Save and synch fertilizer
+				end
 			end
+		else
+			self:sv_performUpdate() -- Catch up to current time
+			self.sv.fertilizer = true
+			self:sv_performUpdate() -- Save and synch fertilizer
 		end
 	end
 end

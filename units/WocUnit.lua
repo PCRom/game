@@ -3,6 +3,12 @@ dofile "$SURVIVAL_DATA/Scripts/util.lua"
 dofile( "$SURVIVAL_DATA/Scripts/game/util/Timer.lua" )
 dofile "$SURVIVAL_DATA/Scripts/game/units/states/PathingState.lua"
 
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_tesla_coil.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/weapons/Fant_ElectroHammer/Fant_ElectroHammer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_flamethrower.lua"
+
 WocUnit = class( nil )
 
 local RoamStartTimeMin = 40 * 10 -- 10 seconds
@@ -30,6 +36,9 @@ function WocUnit.server_onCreate( self )
 		if self.params.deathTick then
 			self.saved.deathTickTimestamp = self.params.deathTick
 		end
+		if self.params.color then
+			self.saved.color = self.params.color
+		end
 	end
 	if not self.homePosition then
 		self.homePosition = self.unit.character.worldPosition
@@ -39,6 +48,10 @@ function WocUnit.server_onCreate( self )
 	end
 	self.storage:save( self.saved )
 
+	if self.saved.color then
+		self.unit.character:setColor( self.saved.color )
+	end
+	
 	self.unit:setWhiskerData( 3, 60 * math.pi / 180, 1.5, 5.0 )
 	self.impactCooldownTicks = 0
 
@@ -94,6 +107,8 @@ function WocUnit.server_onDestroy( self )
 end
 
 function WocUnit.server_onFixedUpdate( self, dt )
+	ProcessTeslaDamage( self, false )
+	FlamethrowerDamage( self, dt )
 	
 	if sm.exists( self.unit ) and not self.destroyed then
 		if self.saved.deathTickTimestamp and sm.game.getCurrentTick() >= self.saved.deathTickTimestamp then
@@ -142,10 +157,12 @@ function WocUnit.server_onFixedUpdate( self, dt )
 		end
 		self.storage:save( self.saved )
 	end
+	
+	
 end
 
 function WocUnit.server_onUnitUpdate( self, dt )
-
+	
 	if not sm.exists( self.unit ) then
 		return
 	end
@@ -213,7 +230,9 @@ function WocUnit.server_onProjectile( self, hitPos, hitTime, hitVelocity, projec
 			self.unit:sendCharacterEvent( "hit" )
 		end
 	end
-
+	if projectileName == "water" then
+		ExtinguishFire( self )
+	end
 	self:sv_takeDamage( damage )
 end
 
@@ -222,12 +241,14 @@ function WocUnit.server_onMelee( self, hitPos, attacker, damage, power )
 		return
 	end
 	local attackingCharacter = attacker:getCharacter()
+	GetMeleeHit( self, attacker )
+	
 	if self.fleeFrom == nil then
 		self.fleeFrom = attacker
 		self.unit:sendCharacterEvent( "hit" )
 	end
 
-	startTumble( self, SMALL_TUMBLE_TICK_TIME, self.idleState )
+	--startTumble( self, SMALL_TUMBLE_TICK_TIME, self.idleState )
 	self:sv_takeDamage( damage )
 	local attackDirection = ( hitPos - attackingCharacter.worldPosition ):normalize()
 	ApplyKnockback( self.unit.character, attackDirection, power )
@@ -262,11 +283,11 @@ function WocUnit.server_onCollision( self, other, collisionPosition, selfPointVe
 		self:sv_takeDamage( damage )
 	end
 	if tumbleTicks > 0 then
-		if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
-			if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
-				sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
-			end
-		end
+		-- if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
+			-- if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
+				-- sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
+			-- end
+		-- end
 	end
 end
 
@@ -284,6 +305,38 @@ function WocUnit.sv_flee( self, from )
 	self.fleeState.maxFleeTime = math.random( FleeTimeMin, FleeTimeMax ) / 40
 	self.fleeState.maxDeviation = 45 * math.pi / 180
 	self.currentState:start()
+end
+
+
+
+function WocUnit.sv_takeFireDamage( self, damage )
+	if self.saved.stats.hp > 0 then
+		self.saved.stats.hp = self.saved.stats.hp - damage
+		self.saved.stats.hp = math.max( self.saved.stats.hp, 0 )
+		print( "'WocUnit' received:", damage, "damage.", self.saved.stats.hp, "/", self.saved.stats.maxhp, "HP" )
+
+		if self.saved.stats.hp <= 0 then
+			self:sv_onFireDeath()
+			sm.effect.playEffect( "Woc - Destruct", self.unit.character.worldPosition )
+		else
+			self.storage:save( self.saved )
+			sm.effect.playEffect( "Woc - Panic", self.unit.character.worldPosition )
+		end
+	end
+end
+
+function WocUnit.sv_onFireDeath( self )
+	local character = self.unit:getCharacter()
+	if not self.destroyed then
+		self.saved.stats.hp = 0
+		self.unit:destroy()
+		print("'WocUnit' killed!")
+		local params = { lootUid = obj_consumable_fant_steak, lootQuantity = 1, epic = false }
+		sm.projectile.customProjectileAttack( params, "loot", 0, character.worldPosition, sm.vec3.new( 0, 0, 0 ), self.unit, character.worldPosition, character.worldPosition, 0 )
+		
+		
+		self.destroyed = true
+	end
 end
 
 function WocUnit.sv_takeDamage( self, damage )
@@ -316,6 +369,15 @@ function WocUnit.sv_onDeath( self )
 	end
 end
 
-function WocUnit.sv_e_onEnterWater( self ) end
+function WocUnit.sv_e_onEnterWater( self )
+	ExtinguishFire( self )
+end
 
 function WocUnit.sv_e_onStayWater( self ) end
+
+function WocUnit.server_onCharacterChangedColor( self, color )
+	if self.saved.color ~= color then
+		self.saved.color = color
+		self.storage:save( self.saved )
+	end
+end

@@ -4,6 +4,15 @@ dofile( "$SURVIVAL_DATA/Scripts/game/util/Timer.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/survival_camera.lua" )
 dofile( "$SURVIVAL_DATA/Scripts/game/managers/QuestManager.lua" )
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_tesla_coil.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_flamethrower.lua"
+
+
+g_Players = g_Players or {}
+local Speed_Boost_Multiplicator = 2.5
+local Jump_Boost_Force = 22.5
+Player_VS_Player = false
+
 SurvivalPlayer = class( nil )
 
 
@@ -19,18 +28,18 @@ local FastHpRecovery = 75 * PerMinute
 local FoodCostPerHpRecovery = 0.2
 local FastFoodCostPerHpRecovery = 0.2
 
-local FoodCostPerStamina = 0.02
-local WaterCostPerStamina = 0.1
-local SprintStaminaCost = 0.7 / 40 -- Per tick while sprinting
-local CarryStaminaCost = 1.4 / 40 -- Per tick while carrying
+local FoodCostPerStamina = 0.01
+local WaterCostPerStamina = 0.01
+local SprintStaminaCost = 0.05 / 40 -- Per tick while sprinting
+local CarryStaminaCost = 0.08 / 40 -- Per tick while carrying
 
-local FoodLostPerSecond = 100 / 3.5 / 24 / 60
-local WaterLostPerSecond = 100 / 2.5 / 24 / 60
+local FoodLostPerSecond = 50 / 3.5 / 24 / 60
+local WaterLostPerSecond = 50 / 2.5 / 24 / 60
 
-local BreathLostPerTick = ( 100 / 60 ) / 40
+local BreathLostPerTick = ( 50 / 60 ) / 40
 
-local FatigueDamageHp = 1 * PerSecond
-local FatigueDamageWater = 2 * PerSecond
+local FatigueDamageHp = 0.25 * PerSecond
+local FatigueDamageWater = 0.5 * PerSecond
 local FireDamage = 10
 local FireDamageCooldown = 40
 local DrownDamage = 5
@@ -65,7 +74,11 @@ function SurvivalPlayer.server_onCreate( self )
 			hp = 100, maxhp = 100,
 			food = 100, maxfood = 100,
 			water = 100, maxwater = 100,
-			breath = 100, maxbreath = 100
+			breath = 100, maxbreath = 100,
+			speed = 0, maxspeed = 1000,
+			damagebuff = 0, maxdamagebuff = 1000,
+			jumpboost = 0, maxjumpboost = 1000,
+			refinebuff = 0, maxrefinebuff = 1000
 		}
 		self.sv.saved.isConscious = true
 		self.sv.saved.hasRevivalItem = false
@@ -74,7 +87,66 @@ function SurvivalPlayer.server_onCreate( self )
 		self.sv.saved.inOil = false
 		self.storage:save( self.sv.saved )
 	end
+	self.sv.saved.stats.speed = 0
+	self.sv.saved.stats.damagebuff = 0
+	self.sv.saved.stats.jumpboost = 0
+	self.sv.saved.stats.refinebuff = 0
+	self:sv_SaveGlobalData( self.sv.saved.stats )
 	self:sv_init()
+end
+
+function SurvivalPlayer.PlaceSoil( self, pos )
+	local rot = math.random( 0, 3 ) * math.pi * 0.5
+	sm.harvestable.create( hvs_soil, pos, sm.quat.angleAxis( rot, sm.vec3.new( 0, 0, 1 ) ) * sm.quat.new( 0.70710678, 0, 0, 0.70710678 ) )
+	sm.effect.playEffect( "Plants - SoilbagUse", pos, nil, sm.quat.angleAxis( rot, sm.vec3.new( 0, 0, 1 ) ) * sm.quat.new( 0.70710678, 0, 0, 0.70710678 ) )
+end
+
+function SurvivalPlayer.Cleanup( self, radius )
+	self.cleanup = true
+	self.areaTrigger = sm.areaTrigger.createBox( sm.vec3.new( 1, 1, 1 ) * radius, self.player:getCharacter().worldPosition, sm.quat.identity(), sm.areaTrigger.filter.all )	
+	print( "Cleanup Start!" )
+end
+
+function SurvivalPlayer.CleanupLoop( self, character )
+	if self.areaTrigger == nil then
+		return
+	end
+	if self.cleanup == nil then
+		return
+	end
+	if self.cleanup == false then
+		return
+	end
+	self.areaTrigger:setWorldPosition( character.worldPosition )
+	local hasDeleted = false
+	for _, result in ipairs(  self.areaTrigger:getContents() ) do
+		if result ~= nil then
+			--print( type( result ) )
+			if type( result ) == "Harvestable" then
+				sm.harvestable.destroy( result )	
+			end
+			if type( result ) == "Body" then
+				local shapes = sm.body.getShapes( result )
+				for i, k in pairs ( shapes ) do 
+					k:destroyShape()
+				end
+			end
+			hasDeleted = true
+		end
+	end
+	if hasDeleted then
+		self.cleanup = false
+		print( "Cleanup Finish!" )
+	end
+end
+
+
+function SurvivalPlayer.setPVP( self, pvp )
+	Player_VS_Player = pvp
+end
+
+function SurvivalPlayer.getPVP( self )
+	self.network:sendToClients( "setPVP", Player_VS_Player )
 end
 
 function SurvivalPlayer.server_onRefresh( self )
@@ -301,6 +373,20 @@ function SurvivalPlayer.cl_localPlayerUpdate( self, dt )
 		self.cl.underwaterEffect:setPosition( character.worldPosition )
 		self.cl.hungryEffect:setPosition( character.worldPosition )
 		self.cl.thirstyEffect:setPosition( character.worldPosition )
+		self:FantDisplay( character, dt )
+		
+		
+		
+		local ID = self.player:getId()
+		if g_Players[ID] ~= nil then
+			if g_Players[ID].jumpboost ~= nil then
+				if g_Players[ID].jumpboost >= 1 then
+					local Force = sm.vec3.new( 0, 0, Jump_Boost_Force )
+					sm.physics.applyImpulse( character, Force, true, sm.vec3.new( 0, 0, 0 ) )
+				end
+			end
+		end
+
 	end
 end
 
@@ -327,6 +413,184 @@ function SurvivalPlayer.client_onInteract( self, character, state )
 	end
 end
 
+local jumpMsgPrintTimer = 0
+
+function SurvivalPlayer.JumpBoostLoop( self, character )
+	if self.sv.saved.stats.jumpboost == nil then
+		self.sv.saved.stats.jumpboost = 0
+	end
+	if self.sv.saved.stats.jumpboost > 0 then
+		self.sv.saved.stats.jumpboost = self.sv.saved.stats.jumpboost - (1 / 40)
+		if self.sv.saved.stats.jumpboost <= 0 then
+			self.sv.saved.stats.jumpboost = 0
+		end
+		local TimerLimit = 1	
+		if self.sv.saved.stats.jumpboost >= 30 then
+			TimerLimit = 15
+		end
+
+		
+		jumpMsgPrintTimer = jumpMsgPrintTimer + (1 / 40)
+		if jumpMsgPrintTimer >= TimerLimit then
+			jumpMsgPrintTimer = 0
+			self.network:sendToClients( "JumpBoost", self.sv.saved.stats.jumpboost )
+			self:sv_SaveGlobalData( self.sv.saved.stats )
+		end		
+	end
+end
+
+function SurvivalPlayer.JumpBoost( self, value ) 
+	if self.player == sm.localPlayer.getPlayer() then
+		local duration = 1.25
+		if value >= 20 then
+			duration = 3
+		end
+		sm.gui.displayAlertText( "Jump Boost ends in " ..  tostring(math.floor(value)) .. " seconds!", duration )
+	end
+	
+end
+
+
+local speedMsgPrintTimer = 0
+
+function SurvivalPlayer.Speed( self, character )
+	if self.sv.saved.stats.speed == nil then
+		self.sv.saved.stats.speed = 0
+	end
+	if self.sv.saved.stats.speed > 0 then
+		self.sv.saved.stats.speed = self.sv.saved.stats.speed - (1 / 40)
+		if self.sv.saved.stats.speed <= 0 then
+			self.sv.saved.stats.speed = 0
+		end
+		character.movementSpeedFraction = Speed_Boost_Multiplicator
+		
+		speedMsgPrintTimer = speedMsgPrintTimer + (1 / 40)
+		local TimerLimit = 1	
+		if self.sv.saved.stats.speed >= 30 then
+			TimerLimit = 15
+		end
+		if speedMsgPrintTimer >= TimerLimit then
+			speedMsgPrintTimer = 0
+			self.network:sendToClients( "SpeedBoost", self.sv.saved.stats.speed )
+			self:sv_SaveGlobalData( self.sv.saved.stats )
+		end		
+	else
+		character.movementSpeedFraction = 1.0
+	end
+end
+
+function SurvivalPlayer.SpeedBoost( self, value ) 
+	if self.player == sm.localPlayer.getPlayer() then
+		local duration = 1.25
+		if value >= 20 then
+			duration = 3
+		end
+		sm.gui.displayAlertText( "Speed Boost ends in " ..  tostring(math.floor(value)) .. " seconds!", duration )
+	end
+end
+
+local damageMsgPrintTimer = 0
+
+function SurvivalPlayer.DamageBuffLoop( self, character )
+	if self.sv.saved.stats.damagebuff == nil then
+		self.sv.saved.stats.damagebuff = 0
+	end
+	if self.sv.saved.stats.damagebuff > 0 then
+		self.sv.saved.stats.damagebuff = self.sv.saved.stats.damagebuff - (1 / 40)
+		if self.sv.saved.stats.damagebuff <= 0 then
+			self.sv.saved.stats.damagebuff = 0
+		end
+		damageMsgPrintTimer = damageMsgPrintTimer + (1 / 40)
+		local TimerLimit = 1	
+		if self.sv.saved.stats.damagebuff >= 30 then
+			TimerLimit = 15
+		end
+		if damageMsgPrintTimer >= TimerLimit then
+			damageMsgPrintTimer = 0
+			self.network:sendToClients( "DamageBuff", self.sv.saved.stats.damagebuff )
+			self:sv_SaveGlobalData( self.sv.saved.stats )
+		end		
+	end
+end
+
+function SurvivalPlayer.DamageBuff( self, value ) 
+	if self.player == sm.localPlayer.getPlayer() then
+		local duration = 1.25
+		if value >= 20 then
+			duration = 3
+		end
+		sm.gui.displayAlertText( "Damage Buff ends in " ..  tostring(math.floor(value)) .. " seconds!", duration )
+	end
+	
+end
+
+
+local refineBoostsgPrintTimer = 0
+
+function SurvivalPlayer.RefineBuffLoop( self, character )
+	if self.sv.saved.stats.refinebuff == nil then
+		self.sv.saved.stats.refinebuff = 0
+	end
+	if self.sv.saved.stats.refinebuff > 0 then
+		self.sv.saved.stats.refinebuff = self.sv.saved.stats.refinebuff - (1 / 40)
+		if self.sv.saved.stats.refinebuff <= 0 then
+			self.sv.saved.stats.refinebuff = 0
+		end
+		refineBoostsgPrintTimer = refineBoostsgPrintTimer + (1 / 40)
+		local TimerLimit = 1	
+		if self.sv.saved.stats.refinebuff >= 30 then
+			TimerLimit = 15
+		end
+		if refineBoostsgPrintTimer >= TimerLimit then
+			refineBoostsgPrintTimer = 0
+			self.network:sendToClients( "RefineBuff", self.sv.saved.stats.refinebuff )
+			self:sv_SaveGlobalData( self.sv.saved.stats )
+		end		
+	end
+end
+
+function SurvivalPlayer.RefineBuff( self, value ) 
+	if self.player == sm.localPlayer.getPlayer() then
+		local duration = 1.25
+		if value >= 20 then
+			duration = 3
+		end
+		sm.gui.displayAlertText( "Refine Buff ends in " ..  tostring(math.floor(value)) .. " seconds!", duration )
+	end
+	
+end
+
+
+
+
+function SurvivalPlayer.FantDisplay( self, character, dt )
+	if self.FantDisplayUpdate == nil then
+		self.FantDisplayUpdate = 0
+	end
+	self.FantDisplayUpdate = self.FantDisplayUpdate + dt
+	if self.FantDisplayUpdate < 0.1 then
+		return
+	end
+	self.FantDisplayUpdate = 0
+	
+	if g_survivalHud then
+		g_survivalHud:setText( "Time", getTimeOfDayString() )
+		
+		if self.RocketsLaunched == nil then
+			self.RocketsLaunched = 0
+		end
+		self.RocketsLaunched = self.RocketsLaunched + 1
+		
+		local TextData = "" --"ROCKETS LAUNCHED\n" ..  tostring( self.RocketsLaunched )
+		if character then
+			local speed =  math.floor( (( sm.vec3.length( character:getVelocity() ) * 1 ) / 1 ) * 3.6 )
+			TextData = "Kmh: " .. tostring( speed ) .. "\n"
+			TextData = TextData .. "Height: " ..  tostring( math.floor( character.worldPosition.z * 10 ) / 10 )
+		end
+		g_survivalHud:setText( "RocketData", TextData )
+	end
+end
+
 function SurvivalPlayer.server_onFixedUpdate( self, dt )
 
 	if g_survivalDev and not self.sv.saved.isConscious and not self.sv.saved.hasRevivalItem then
@@ -345,6 +609,10 @@ function SurvivalPlayer.server_onFixedUpdate( self, dt )
 	local character = self.player:getCharacter()
 	if character then
 		self:sv_updateTumbling()
+		if Player_VS_Player then
+			ProcessTeslaDamage( self, true )  
+			FlamethrowerDamage( self, dt )
+		end
 	end
 
 	-- Delays the respawn so clients have time to fade to black
@@ -392,6 +660,7 @@ function SurvivalPlayer.server_onFixedUpdate( self, dt )
 					self.sv.drownTimer:start( DrownDamageCooldown )
 				end
 			end
+			ExtinguishFire( self )
 		else
 			self.sv.saved.stats.breath = self.sv.saved.stats.maxbreath
 			self.sv.drownTimer:start( DrownDamageCooldown )
@@ -405,6 +674,23 @@ function SurvivalPlayer.server_onFixedUpdate( self, dt )
 		-- Spend stamina on carrying
 		if not self.player:getCarry():isEmpty() then
 			self.sv.staminaSpend = self.sv.staminaSpend + CarryStaminaCost
+		end
+		
+		self:Speed( character )
+		self:DamageBuffLoop( character )
+		self:JumpBoostLoop( character )
+		self:RefineBuffLoop( character )
+		self:CleanupLoop( character )
+		if g_characters then
+			for k, g_character in ipairs(g_characters) do
+				if g_character == character then			
+					character.movementSpeedFraction = 3.5
+					if character:isSprinting() then
+						character.movementSpeedFraction = 20.0
+					end
+					self.sv.saved.stats.breath = self.sv.saved.stats.maxbreath
+				end
+			end
 		end
 	end
 
@@ -460,8 +746,24 @@ function SurvivalPlayer.server_onFixedUpdate( self, dt )
 
 			self.storage:save( self.sv.saved )
 			self.network:setClientData( self.sv.saved )
+			self:sv_SaveGlobalData( self.sv.saved.stats )
 		end
 	end
+end
+
+function SurvivalPlayer.sv_SaveGlobalData( self, stats )
+	if stats == nil then 
+		return
+	end
+	local ID = self.player:getId()
+	g_Players[ID] = stats
+	
+	self.network:sendToClients( "cl_SaveGlobalData", stats )
+end
+
+function SurvivalPlayer.cl_SaveGlobalData( self, stats )
+	local ID = self.player:getId()
+	g_Players[ID] = stats
 end
 
 function SurvivalPlayer.server_onProjectile( self, hitPos, hitTime, hitVelocity, projectileName, attacker, damage )
@@ -474,6 +776,7 @@ function SurvivalPlayer.server_onProjectile( self, hitPos, hitTime, hitVelocity,
 
 	if projectileName == "water"  then
 		self.network:sendToClient( self.player, "cl_n_fillWater" )
+		ExtinguishFire( self )
 	end
 end
 
@@ -514,6 +817,9 @@ function SurvivalPlayer.server_onMelee( self, hitPos, attacker, damage, power )
 			if type( attacker ) == "Unit" then
 				self:sv_takeDamage( damage, "impact" )
 			else
+				if Player_VS_Player then
+					self:sv_takeDamage( damage, "impact" )
+				end
 				self.network:sendToClients( "cl_n_onEvent", { event = "impact", pos = playerCharacter:getWorldPosition(), damage = damage * 0.01 } )
 			end
 
@@ -535,7 +841,26 @@ function SurvivalPlayer.server_onExplosion( self, center, destructionLevel )
 end
 
 function SurvivalPlayer.sv_startTumble( self, tumbleTickTime )
-	if not self.player.character:isDowned() and self.sv.resistTumbleTimer:done() then
+	local HasResist = false
+	if self.sv ~= nil then
+		if self.sv.stats ~= nil then
+			if self.sv.stats.speed ~= nil then
+				if self.sv.stats.speed > 0 then
+					HasResist = true
+				end
+			end
+		end
+	end
+	local character = self.player:getCharacter()
+	if g_characters then
+		for k, g_character in ipairs(g_characters) do
+			if g_character == character then
+				HasResist = true
+				break
+			end
+		end
+	end
+	if not self.player.character:isDowned() and self.sv.resistTumbleTimer:done()  and not HasResist then
 		local currentTick = sm.game.getCurrentTick()
 		self.sv.recentTumbles[#self.sv.recentTumbles+1] = currentTick
 		local recentTumbles = {}
@@ -698,6 +1023,10 @@ function SurvivalPlayer.sv_n_revive( self )
 		self.sv.saved.stats.hp = self.sv.saved.stats.maxhp
 		self.sv.saved.stats.food = self.sv.saved.stats.maxfood
 		self.sv.saved.stats.water = self.sv.saved.stats.maxwater
+		self.sv.saved.stats.speed = 0
+		self.sv.saved.stats.damagebuff = 0
+		self.sv.saved.stats.jumpboost = 0
+		self.sv.saved.stats.refinebuff = 0
 		self.sv.saved.isConscious = true
 		self.sv.saved.hasRevivalItem = false
 		self.storage:save( self.sv.saved )
@@ -709,6 +1038,7 @@ function SurvivalPlayer.sv_n_revive( self )
 		end
 		self.sv.damageCooldown:start( 40 )
 		self.player:sendCharacterEvent( "revive" )
+		self:sv_SaveGlobalData( self.sv.saved.stats )
 	end
 end
 
@@ -784,10 +1114,18 @@ function SurvivalPlayer.sv_onSpawnCharacter( self )
 			self.sv.saved.stats.hp = self.sv.saved.stats.maxhp
 			self.sv.saved.stats.food = self.sv.saved.stats.maxfood
 			self.sv.saved.stats.water = self.sv.saved.stats.maxwater
+			self.sv.saved.stats.speed = 0
+			self.sv.saved.stats.damagebuff = 0
+			self.sv.saved.stats.jumpboost = 0
+			self.sv.saved.stats.refinebuff = 0
 		else
 			self.sv.saved.stats.hp = 30
 			self.sv.saved.stats.food = 30
 			self.sv.saved.stats.water = 30
+			self.sv.saved.stats.speed = 0
+			self.sv.saved.stats.damagebuff = 0
+			self.sv.saved.stats.jumpboost = 0
+			self.sv.saved.stats.refinebuff = 0
 		end
 		self.sv.saved.isConscious = true
 		self.sv.saved.hasRevivalItem = false
@@ -798,6 +1136,7 @@ function SurvivalPlayer.sv_onSpawnCharacter( self )
 		self.player.character:setTumbling( false )
 		self.player.character:setDowned( false )
 		self.sv.damageCooldown:start( 40 )
+		self:sv_SaveGlobalData( self.sv.saved.stats )
 	else
 		-- SurvivalPlayer rejoined the game
 		if self.sv.saved.stats.hp <= 0 or not self.sv.saved.isConscious then
@@ -830,6 +1169,9 @@ function SurvivalPlayer.sv_e_debug( self, params )
 	if params.food then
 		self.sv.saved.stats.food = params.food
 	end
+	if params.breath then
+		self.sv.saved.stats.breath = params.breath
+	end
 	self.storage:save( self.sv.saved )
 	self.network:setClientData( self.sv.saved )
 end
@@ -847,8 +1189,99 @@ function SurvivalPlayer.sv_e_eat( self, edibleParams )
 		self:sv_restoreWater( edibleParams.waterGain )
 		-- self.network:sendToClient( self.player, "cl_n_onEffect", { name = "Eat - DrinkFinish", host = self.player.character } )
 	end
+	if edibleParams.speed then
+		self:sv_restorespeed( edibleParams.speed )
+	end
+	if edibleParams.damagebuff then
+		self:damagebuff( edibleParams.damagebuff )
+	end
+	if edibleParams.jumpboost then
+		self:sv_restorejumpboost( edibleParams.jumpboost )
+	end
+	if edibleParams.refineboost then
+		self:refinebuff( edibleParams.refineboost )
+	end
 	self.storage:save( self.sv.saved )
 	self.network:setClientData( self.sv.saved )
+	self:sv_SaveGlobalData( self.sv.saved.stats )
+end
+
+
+function SurvivalPlayer.sv_restorejumpboost( self, jumpboost )
+	if self.sv.saved.isConscious then
+		if self.sv.saved.stats.jumpboost == nil then
+			self.sv.saved.stats.jumpboost = 0
+			self.sv.saved.stats.maxjumpboost = 1000
+		end
+		if jumpboost == nil then
+			jumpboost = 0
+		end
+		
+		self.sv.saved.stats.jumpboost = self.sv.saved.stats.jumpboost + jumpboost
+		self.sv.saved.stats.jumpboost = math.min( self.sv.saved.stats.jumpboost, self.sv.saved.stats.maxjumpboost )
+		
+		self.network:sendToClients( "JumpBoost", self.sv.saved.stats.jumpboost )
+		print( "'SurvivalPlayer' restored:", jumpboost, "jumpboost." )
+	end
+end
+
+
+function SurvivalPlayer.sv_restorespeed( self, speed )
+	if self.sv.saved.isConscious then
+		if self.sv.saved.stats.speed == nil then
+			self.sv.saved.stats.speed = 0
+			self.sv.saved.stats.maxspeed = 1000
+		end
+		if speed == nil then
+			speed = 0
+		end
+		
+		self.sv.saved.stats.speed = self.sv.saved.stats.speed + speed
+		self.sv.saved.stats.speed = math.min( self.sv.saved.stats.speed, self.sv.saved.stats.maxspeed )
+		
+		self.network:sendToClients( "SpeedBoost", self.sv.saved.stats.speed )
+		print( "'SurvivalPlayer' restored:", speed, "speed." )
+	end
+end
+
+
+function SurvivalPlayer.damagebuff( self, damagebuff )
+	if self.sv.saved.isConscious then
+		if self.sv.saved.stats.damagebuff == nil then
+			self.sv.saved.stats.damagebuff = 0
+			self.sv.saved.stats.maxdamagebuff = 1000
+		end
+		if damagebuff == nil then
+			damagebuff = 0
+		end
+		
+		self.sv.saved.stats.damagebuff = self.sv.saved.stats.damagebuff + damagebuff
+		self.sv.saved.stats.damagebuff = math.min( self.sv.saved.stats.damagebuff, self.sv.saved.stats.maxdamagebuff )
+		
+		self.network:sendToClients( "DamageBuff", self.sv.saved.stats.damagebuff )
+		print( "'SurvivalPlayer' restored:", damagebuff, "damagebuff." )
+	end
+end
+
+
+function SurvivalPlayer.refinebuff( self, refinebuff )
+	if self.sv.saved.isConscious then
+		if self.sv.saved.stats.refinebuff == nil then
+			self.sv.saved.stats.refinebuff = 0
+		end
+		if self.sv.saved.stats.maxrefinebuff == nil then
+			self.sv.saved.stats.maxrefinebuff = 1000
+		end
+		if refinebuff == nil then
+			refinebuff = 0
+		end
+		
+		self.sv.saved.stats.refinebuff = self.sv.saved.stats.refinebuff + refinebuff
+		self.sv.saved.stats.refinebuff = math.min( self.sv.saved.stats.refinebuff, self.sv.saved.stats.maxrefinebuff )
+		
+		self.network:sendToClients( "RefineBuff", self.sv.saved.stats.refinebuff )
+		print( "'SurvivalPlayer' restored:", refinebuff, "refinebuff." )
+	end
 end
 
 function SurvivalPlayer.sv_e_feed( self, params )
@@ -1009,7 +1442,6 @@ function SurvivalPlayer.server_onShapeRemoved( self, removedShapes )
 	local staminaSpend = numParts + numJoints + math.sqrt( numBlocks )
 	--self:sv_e_staminaSpend( staminaSpend )
 end
-
 
 -- Camera
 

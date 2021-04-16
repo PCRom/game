@@ -10,6 +10,20 @@ ContainerUuids = {
     obj_container_chest,
     obj_container_chemical,
     obj_craftbot_refinery,
+	--00Fant start
+	obj_interactive_fant_chest,
+	obj_interactive_fant_miner,
+	obj_decor_sunshakemachine,
+	obj_interactive_fant_large_container,
+	obj_interactive_fant_seedpress,
+	obj_interactive_fant_beehive,
+	obj_interactive_fant_seaclam,
+	obj_interactive_fant_teleport_pipe_in,
+	obj_interactive_fant_teleport_pipe_out,
+	obj_interactive_fant_pigmentflower_grower,
+	obj_container_fant_explosive_Ammo,
+	obj_interactive_fant_toilet
+	--00Fant end
 }
 
 PipeUuids = {
@@ -18,7 +32,12 @@ PipeUuids = {
     obj_pneumatic_pipe_03,
     obj_pneumatic_pipe_04,
     obj_pneumatic_pipe_05,
-    obj_pneumatic_pipe_bend
+    obj_pneumatic_pipe_bend,
+	--00Fant start
+	obj_interactive_mcp,
+	obj_interactive_mcp2,
+	obj_interactive_mcp3	
+	--00Fant end
 }
 for _,v in ipairs( ContainerUuids ) do assert( v ) end
 for _,v in ipairs( PipeUuids ) do assert( v ) end

@@ -1,5 +1,243 @@
 -- this file is generated
 
+
+-- 00Fant Start
+
+obj_interactive_mcp = sm.uuid.new( "6245eb8d-3f76-4c37-b6b3-a12d94cd7b5b" )
+obj_interactive_mcp2 = sm.uuid.new( "f5f74fc0-f109-47bd-834d-93397361f036" )
+obj_interactive_mcp3 = sm.uuid.new( "d5222258-e3e8-4ae3-b8b4-2583e82d6ae0" )
+obj_interactive_fant_chest = sm.uuid.new( "edc811c8-9f43-4e34-b621-d2a43cc1497a" )
+obj_interactive_fant_large_container = sm.uuid.new( "61cd8c04-7ff0-4bdc-9c08-4c44526d9ba2" )
+obj_interactive_fant_campfire = sm.uuid.new( "75840031-eb33-499e-b203-b5ecaa57b35a" )
+obj_interactive_fant_miner = sm.uuid.new( "e88fd8f4-b6d8-484c-825f-d29cb252b021" )
+obj_interactive_fant_autocrafter = sm.uuid.new( "64dceaa3-b102-43bf-bfd8-8c39157b2448" )
+obj_interactive_fant_seedpress = sm.uuid.new( "6b84b669-a9fe-42f7-81ad-4c13eb139bf2" )
+obj_interactive_fant_beehive = sm.uuid.new( "17478697-1db1-4e86-adc6-b2e05a9f1349" )
+obj_interactive_fant_seaclam = sm.uuid.new( "2b67d231-2a44-49bb-bb1f-303921cec949" )
+obj_interactive_fant_fluidconnector = sm.uuid.new( "13774651-effe-455e-9c1a-759b76822a4c" )
+obj_interactive_fant_teleport_pipe_in = sm.uuid.new( "f231a858-7b08-494a-977a-dd1db8288834" )
+obj_interactive_fant_teleport_pipe_out = sm.uuid.new( "545a675e-cece-4120-a6d3-574cafc14062" )
+obj_interactive_fant_pigmentflower_grower = sm.uuid.new( "a6c91fad-5cce-403d-bddc-d3842b2262f5" )
+obj_interactive_fant_altimeter = sm.uuid.new( "dd64738f-824e-4c14-a3e9-74471116127d" )
+obj_interactive_fant_laserpointer = sm.uuid.new( "13c4d813-a3e5-4c09-ac9f-81663f87069d" )
+obj_interactive_fant_growing_sensor = sm.uuid.new( "b928325c-9b96-4bc1-b8bd-2c9daa2f8edb" )
+obj_interactive_fant_flag = sm.uuid.new( "ffadf4e8-e12f-42d5-ba74-b93553ef0897" )
+obj_interactive_fant_toilet = sm.uuid.new( "3cee1251-8016-4746-aabf-86eab24b642b" )
+obj_interactive_fant_unitfacer = sm.uuid.new( "979b2a00-dbc4-4275-8fd6-1afb5933d383" )
+obj_interactive_fant_rotor = sm.uuid.new( "fd44effd-3e85-410e-b3bd-9e34045840f7" )
+obj_interactive_fant_rotor_large = sm.uuid.new( "0b2de866-1acf-41b9-9425-8eeb6c1df69b" )
+obj_interactive_fant_camera = sm.uuid.new( "1501095a-63b3-4e93-adda-1950ef34e0df" )
+obj_interactive_fant_unitfacer_hub = sm.uuid.new( "01a21d10-a14c-4cd2-a0c4-8584453caabf" )
+
+
+
+
+obj_interactive_cfd = sm.uuid.new( "e2365e4f-27e7-4f54-b961-4b4eb371b2bd" )
+obj_interactive_fant_daylight_sensor = sm.uuid.new( "f285b388-b132-4a5e-af2d-dbf920b7950b" )
+obj_interactive_fant_anchor = sm.uuid.new( "b99153cf-1ddd-4c00-ab4e-f59c4c41dde3" )
+obj_interactive_fant_itemdetector = sm.uuid.new( "76762d72-01c0-47ae-8f3f-69cc39a529ec" )
+obj_interactive_fant_robotScanner = sm.uuid.new( "c4d9b90f-87b7-472b-b5a0-89920dd6d3dd" )
+obj_interactive_fant_itemframe = sm.uuid.new( "25257bb9-5322-47d9-8d82-91a424665df8" )
+obj_interactive_wasd_converter = sm.uuid.new( "0e16480c-697c-4511-9f7f-0656012bda72" )
+obj_interactive_logoframe = sm.uuid.new( "780c3f8c-03a3-4733-aab7-1e37f6559e64" )
+obj_interactive_fant_angle_sensor = sm.uuid.new( "48b2aeca-8a51-4a42-8577-0b3b7f1ab9b5" )
+obj_interactive_fant_smoker = sm.uuid.new( "7e6463ef-1856-4595-9be0-64514d759061" )
+obj_interactive_fant_wireless = sm.uuid.new( "028ac28e-d8ad-464a-9b5a-fcd9e7c16aee" )  
+obj_interactive_fant_clock_body = sm.uuid.new( "21b40b90-2cc4-4b03-82a8-900b2cef2796" )
+obj_interactive_fant_plastic = sm.uuid.new( "4a9210de-1160-4896-94a0-c8c19653ce8a" )
+obj_interactive_fant_wire = sm.uuid.new( "4e9e7544-78ec-4ae9-b925-1665cccd8cfb" )
+
+
+obj_interactive_fant_simple_controller = sm.uuid.new( "a4a410ba-c7db-4b84-8361-be17e19a911a" )
+obj_interactive_fant_gyroscope = sm.uuid.new( "fb549501-0a4f-4548-8033-c8fb65c04f4f" )
+obj_interactive_fant_gyroscope3x3 = sm.uuid.new( "cc5ff101-8beb-4e10-98de-86fc9d8987e8" )
+obj_interactive_fant_steamengine = sm.uuid.new( "30e7290f-594e-40b3-8a09-fb5eef728060" )
+
+obj_interactive_fant_c_engine_v8 = sm.uuid.new( "ec399c99-c311-4635-b61c-e41eaeba23d7" )
+
+
+blk_fant_block = sm.uuid.new( "f7881097-9320-4667-b2ba-4101c72b8730" )
+
+blk_fant_long_wedge_1x2x1 = sm.uuid.new( "2343987a-1272-4f80-8f80-f09f4814e337" )
+blk_fant_long_wedge_left_1x2x1 = sm.uuid.new( "0528e821-17d4-4bb5-9b6c-33670f6edb1b" )
+blk_fant_long_wedge_left_b_1x2x1 = sm.uuid.new( "5f419a96-15ca-4264-84fc-686683515f3d" )
+blk_fant_long_wedge_right_1x2x1 = sm.uuid.new( "04244360-adf8-410e-b095-5f1ed223dd3e" )
+blk_fant_long_wedge_right_a_1x2x1 = sm.uuid.new( "c4803fa1-86e7-42fe-8fd9-cd5538349fed" )
+blk_fant_long_wedge_right_b_1x2x1 = sm.uuid.new( "df9f3191-6614-4682-b65f-1aa38c58b6c2" )
+blk_fant_long_wedge_tip_1x2x1 = sm.uuid.new( "d86f8a96-2481-4555-a0e4-91558e34ebeb" )
+blk_fant_square_wedge_2x2x1 = sm.uuid.new( "0858f970-c1b8-4d14-b0a7-9ec276a5b45a" )
+blk_fant_square_wedge_inner_2x2x1 = sm.uuid.new( "32e724e9-f5dd-471a-ab56-ea07180ac73d" )
+blk_fant_square_wedge_tip_2x2x1 = sm.uuid.new( "bad11ab7-8f2a-48f1-b842-622164860ab6" )
+blk_fant_wedge_1x1x1 = sm.uuid.new( "d7ac59f0-8c22-4178-a241-dccf13f36690" )
+blk_fant_wedge_inner_a_1x1x1 = sm.uuid.new( "2a1d5fc4-c895-4f4a-b03f-220284e8069c" )
+blk_fant_wedge_inner_b_1x1x1 = sm.uuid.new( "1abd0536-21f2-4f2e-8dc1-b710a84f738e" )
+blk_fant_wedge_outer_a_1x1x1 = sm.uuid.new( "0c3a579c-5cbd-4eb3-b6db-a1c658ff20ca" )
+blk_fant_wedge_outer_b_1x1x1 = sm.uuid.new( "7de0912c-a453-4f19-bb61-518c2f1873da" )
+blk_fant_long_wedge_tip2_1x2x1 = sm.uuid.new( "e4904167-8994-4cfb-b86f-4a56794619aa" )
+blk_fant_panel_1x1 		 = sm.uuid.new( "58fd9d50-4190-4bdc-888a-65396c719aee" )
+blk_fant_panel_1x2 		 = sm.uuid.new( "73eb3376-3fb2-4ef2-adfd-1d8e58a6d986" )
+blk_fant_panel_1x3 		 = sm.uuid.new( "918274d2-6ea4-4ac3-b966-a58ea04695df" )
+blk_fant_panel_2x2 		 = sm.uuid.new( "8e672d85-cf95-445b-81e7-7da734eeb98e" )
+blk_fant_panel_2x3 		 = sm.uuid.new( "bc14d2d9-8688-4412-9ae6-07e3f822edb5" )
+blk_fant_panel_3x3 		 = sm.uuid.new( "cb1984b3-3f2e-4a5c-bca6-fcc07e5ad4d3" )
+blk_fant_panel_edge_1x1  = sm.uuid.new( "325885fc-41ad-439b-8258-c8a7cc5a19dd" )
+blk_fant_panel_edge_1x2  = sm.uuid.new( "8dafa1fb-3b0a-4dc2-9f19-9bde3c7b5d45" )
+blk_fant_panel_edge_1x2b = sm.uuid.new( "36acb481-e303-403c-a529-e0d51956a376" )
+
+
+blk_fant_long_wedge_1x2x1_glass = sm.uuid.new( "bf4e9c49-251d-4e58-9c61-1f55580dd816" )
+blk_fant_long_wedge_left_1x2x1_glass = sm.uuid.new( "7d0fff27-d8f3-49fd-b944-12883db43854" )
+blk_fant_long_wedge_right_1x2x1_glass = sm.uuid.new( "310cf7ac-308b-4cf7-9211-bb08e162f56c" )
+blk_fant_long_wedge_right_a_1x2x1_glass = sm.uuid.new( "bd436fd9-167b-414c-8401-ad9085f204e8" )
+blk_fant_long_wedge_right_b_1x2x1_glass = sm.uuid.new( "52e0ad8e-1447-4155-82a1-c2370df2e0be" )
+blk_fant_long_wedge_tip_1x2x1_glass = sm.uuid.new( "3c00d1ed-f10f-4f8a-b482-9ee0eff07fff" )
+blk_fant_square_wedge_2x2x1_glass = sm.uuid.new( "2817328b-eb27-4581-88aa-87db401d1d5a" )
+blk_fant_square_wedge_inner_2x2x1_glass = sm.uuid.new( "c6764879-b597-4a8a-96da-d4e299bd868b" )
+blk_fant_square_wedge_tip_2x2x1_glass = sm.uuid.new( "4a167e1d-c655-427f-a6ec-575ccf454de3" )
+blk_fant_wedge_1x1x1_glass = sm.uuid.new( "a8cc4e69-cf24-45b4-bfa4-038b9bffb6dd" )
+blk_fant_wedge_inner_a_1x1x1_glass = sm.uuid.new( "25e3fd87-dc79-4e3c-a2e0-25f5f17335f7" )
+blk_fant_wedge_inner_b_1x1x1_glass = sm.uuid.new( "1cce2eaf-a531-456e-8100-065d8047fb2a" )
+blk_fant_wedge_outer_a_1x1x1_glass = sm.uuid.new( "a7805c93-c899-48f0-80d9-30fbee3f92f4" )
+blk_fant_wedge_outer_b_1x1x1_glass = sm.uuid.new( "4aefd793-fab8-46fe-bb25-8ef0f633b9db" )
+blk_fant_long_wedge_left_b_1x2x1_glass = sm.uuid.new( "000f5afb-6d9f-4c76-b0b0-08dbfd9374c3" )
+blk_fant_long_wedge_tip2_1x2x1_glass = sm.uuid.new( "0065dbf3-7e58-44f0-b126-f5d23d2bba3b" ) 
+
+blk_fant_panel_1x1_glass 		= sm.uuid.new( "f82015fe-eaad-4b28-83ee-0196ce410ab0" )
+blk_fant_panel_1x2_glass 		= sm.uuid.new( "179dc352-6125-41aa-bd3f-1f90e46fac55" )
+blk_fant_panel_1x3_glass 		= sm.uuid.new( "604216fc-ae13-4f0b-b3c4-d34b819a3a73" )
+blk_fant_panel_2x2_glass 		= sm.uuid.new( "542dc185-ba0f-4c2b-bca9-e19af15c4896" )
+blk_fant_panel_2x3_glass 		= sm.uuid.new( "22196fd6-c7bf-44c9-af07-da324caf52f6" )
+blk_fant_panel_3x3_glass 		= sm.uuid.new( "86bafde1-a528-469a-8d25-d3197bde7f93" )
+blk_fant_panel_edge_1x1_glass = sm.uuid.new( "a6ab767c-b136-46e6-99ec-dd5ed4bf54a6" )
+blk_fant_panel_edge_1x2_glass = sm.uuid.new( "d240e52e-4254-4a28-a078-ca81ae8d6208" )
+blk_fant_panel_edge_1x2b_glass = sm.uuid.new( "ac160523-d828-416c-9703-5ad815b138df" )
+
+
+
+obj_consumable_fant_steak = sm.uuid.new( "e34fbaa0-6ef6-4414-b8f0-959896729e89" )
+obj_consumable_fant_redwoc = sm.uuid.new( "79bff247-1701-4ab4-a73a-120121e2ddbc" )
+obj_consumable_fant_totebots = sm.uuid.new( "cec77554-5bbd-4cd2-b40a-2f1c4c6fc9dc" )
+obj_consumable_fant_fries = sm.uuid.new( "ad4709b7-70d4-4eb8-ac18-542a1200d702" )
+obj_consumable_fant_popcorn = sm.uuid.new( "467a8e45-10b0-4a56-943d-8356934b3e6c" )
+obj_consumable_fant_met = sm.uuid.new( "61bd9d0f-ceac-4175-b9a8-1f1cafbfe6d9" )
+
+
+obj_interactive_fant_cannon_1 = sm.uuid.new( "c4cf5661-f6a3-4720-9f71-7ccf3b22c667" )
+obj_container_fant_explosive_Ammo = sm.uuid.new( "557c1087-9023-476f-b5b4-80f0a8a17ce3" )
+obj_interactive_fant_mountable_shotgun = sm.uuid.new( "3cfddced-fc47-44fe-9881-9eeb2816c499" )
+obj_interactive_chemicalcannon = sm.uuid.new( "6ccda6ba-f97d-485f-8bcf-6fd47d35dcbb" )
+obj_interactive_fant_tesla_coil = sm.uuid.new( "03cf8f6a-814b-4ebd-8f5e-5ba9487f2a82" )
+obj_interactive_fant_flamethrower = sm.uuid.new( "89a2a30c-ae53-458f-8832-371fcdf8cc4a" )
+
+weapon_fant_bananammer = sm.uuid.new( "8a5f1e93-3627-4b3f-94cc-b1b05c9ad780" )       	-- "uuid": "e15cdeec-02fb-4113-8626-c66dde3232b5",
+weapon_fant_baseballbat = sm.uuid.new( "ff3bebd8-47d7-4e7a-87fe-f55af566effc" )			-- "uuid": "5120e4c9-c160-4434-87f4-c2313e2602c8",
+weapon_fant_constructionlamp = sm.uuid.new( "3930f82a-7d04-4376-b048-62c5c58bee3d" )	-- "uuid": "edeea470-6eda-40ef-95e6-5d37a10bade5",
+weapon_fant_electroHammer = sm.uuid.new( "6686a74b-0068-42b6-8494-6d9fb09c808a" )		-- "uuid": "40bf4cb9-e857-44de-89b8-0a42de20ebd5",
+weapon_fant_greatNeckWrench = sm.uuid.new( "af2e87fc-55d9-4f4d-b043-31412757f56f" )		-- "uuid": "cadac9b3-8b3b-4b8e-a50a-f1f23f47a7fc",
+weapon_fant_redwochammer = sm.uuid.new( "b4b98a4e-9726-40c1-b9b5-135726abab56" )		-- "uuid": "4bec43af-809c-4e01-a249-72ce8184f430",
+weapon_fant_fork = sm.uuid.new( "4e7aa2f0-f371-4a69-93f4-5e625e2ad5eb" )				-- "uuid": "41936190-31bf-4cbd-93b4-8e7f2ac2f9c3",
+weapon_fant_bazooka = sm.uuid.new( "6125d38d-687b-41fa-bbf5-80c749982c3b" )				-- "uuid": "df1dacba-9905-4dce-aacc-16a1e3c2aef1",
+weapon_fant_watergun = sm.uuid.new( "2dd19bf4-41e1-46b6-9166-dbd8c32a9b6d" )			
+weapon_fant_watergun_obj = sm.uuid.new( "8c61b1db-4070-4f12-afcb-0fcd2515d481" )				
+weapon_fant_handheld_flamethrower = sm.uuid.new( "b03b439f-fe9d-4068-a9e9-c7c28b45a0db" )			
+weapon_fant_handheld_flamethrower_obj = sm.uuid.new( "84cef3c6-7ec2-4354-bd5c-dc88c2c5fb9b" )				
+
+
+obj_powertools_fant_drill_small = sm.uuid.new( "846ce978-d609-4a67-b9d6-996e5c5cbd16" )
+obj_powertools_fant_drill = sm.uuid.new( "8ccf972b-8241-4be2-a7b9-3e69db41ea15" )
+obj_powertools_fant_drill_large = sm.uuid.new( "68fba88c-aa80-469e-8372-b9fdf39aab6f" )
+
+
+obj_interactive_fant_wing_1 = sm.uuid.new( "34ad497c-9319-4c6a-b1bc-7b72bab05f62" )
+obj_interactive_fant_wing_2 = sm.uuid.new( "0757dc8d-1e7c-42cc-b744-8ac1b52a57a2" )
+obj_interactive_fant_wing_3 = sm.uuid.new( "b0f771a0-5ab5-4476-96ad-d25820a8efc9" )
+obj_interactive_fant_wing_1_2w = sm.uuid.new( "42da0a7c-cdd2-41af-9a95-fee7cb547cb0" )
+obj_interactive_fant_wing_2_2w = sm.uuid.new( "a5339024-7e83-41c0-bfd7-6b8c82617687" )
+obj_interactive_fant_wing_3_2w = sm.uuid.new( "c975f08c-5ea7-4cff-84b7-86dc17bba461" )
+obj_interactive_fant_wing_1to2 = sm.uuid.new( "e936b99d-6f8e-4c78-b956-15da3ec8e0a3" )
+obj_interactive_fant_wing_2to3 = sm.uuid.new( "51d41599-2fcc-488e-b606-29b92d06dd32" )
+obj_interactive_fant_wing_1to2w = sm.uuid.new( "7d1668b1-fa52-4e9c-bb11-85ba068ab523" )
+obj_interactive_fant_wing_2to3w = sm.uuid.new( "95ab4c03-a56c-4a71-bab8-6520202f3ead" )
+
+obj_interactive_fant_propeller_1 = sm.uuid.new( "8ee66968-050a-4fcb-8004-2f9c3a00ecb7" )
+obj_interactive_fant_propeller_2 = sm.uuid.new( "f32c6c8b-49a6-4dfa-b1d1-051bc41bfbb6" )
+obj_interactive_fant_propeller_3 = sm.uuid.new( "6c1f5101-c9bc-499e-af3c-07daf666727d" )
+obj_interactive_fant_propeller_4 = sm.uuid.new( "3756152c-cd75-4693-8c65-3bc20497fb11" )
+
+obj_interactive_chemical_lift_engine = sm.uuid.new( "94da76d8-bae1-4edc-8b5c-85564c41cf22" )
+
+
+--1x1
+obj_interactive_fant_wheel_large_6 = sm.uuid.new( "e8752a5f-5940-49ae-9e27-98ae340f71be" ) 
+--3x1 vanilla
+--5x2 vanilla
+--5x1
+obj_interactive_fant_wheel_small_2 = sm.uuid.new( "21e97817-af67-4cba-909e-6c90aada4e0e" )
+--5x1b
+obj_interactive_fant_wheel_large_2b = sm.uuid.new( "9295e529-8989-4075-96ab-76c650311366" )
+--7x1
+obj_interactive_fant_wheel_large_7 = sm.uuid.new( "82b2b72d-4d5b-4a91-9781-994bb74d958c" )  
+--7x2
+obj_interactive_fant_wheel_large_2 = sm.uuid.new( "59a4ff90-313b-4b3e-ae6d-0dffea990fc4" )
+--7x3
+obj_interactive_fant_wheel_large_3 = sm.uuid.new( "09e02dca-5a53-4765-8028-2ea5a78c1e82" )
+--9x1
+obj_interactive_fant_wheel_large_8 = sm.uuid.new( "2de13ee0-c5ce-4631-948d-aef89d555eb4" ) 
+--9x2
+obj_interactive_fant_wheel_large_9 = sm.uuid.new( "7127b0dd-a525-4a82-88b4-acab4e444513" ) 
+--9x3
+obj_interactive_fant_wheel_large_5 = sm.uuid.new( "d8ae4d34-2f2d-40c4-b9d3-7ed492b34aee" )
+--9x4
+obj_interactive_fant_wheel_large_4 = sm.uuid.new( "f159cebf-d4f6-4492-87ad-733cd967be89" )
+--9x5
+obj_interactive_fant_wheel_large_10 = sm.uuid.new( "38d1fdf6-1ac8-472b-a7e2-bdaa88ceffd6" )
+--1x1
+obj_interactive_fant_offroad_wheel_6 = sm.uuid.new( "56126ecb-4e3a-472f-a354-1becaff45a84" )
+--3x1
+obj_interactive_fant_offroad_wheel_3 = sm.uuid.new( "95c2d073-2e8b-4ed4-96da-cfd59e2acc6a" )
+--5x1
+obj_interactive_fant_offroad_wheel_2 = sm.uuid.new( "f746094f-0c25-42a2-8769-5899d7c86266" )
+--5x1b
+obj_interactive_fant_offroad_wheel_2b = sm.uuid.new( "f3deb199-8727-459d-91f4-4662102dc7ac" )
+--5x2
+obj_interactive_fant_offroad_wheel_1 = sm.uuid.new( "03b867c9-fdd2-47fc-870e-50bccc56eea0" )
+--7x1
+obj_interactive_fant_offroad_wheel_4 = sm.uuid.new( "3cc5c65c-12e8-4043-a57e-84cf31a22ce0" )
+--7x2
+obj_interactive_fant_offroad_wheel_5 = sm.uuid.new( "d9695587-158e-4aa3-aabf-73f6a60cab3d" )
+--7x3
+obj_interactive_fant_offroad_wheel_7 = sm.uuid.new( "368f194f-8891-41d0-9074-c4b94c4811ee" )  
+--9x1
+obj_interactive_fant_offroad_wheel_8 = sm.uuid.new( "a4f5e9f7-be5f-4de2-ad54-d06323a6241c" ) 
+--9x2
+obj_interactive_fant_offroad_wheel_9 = sm.uuid.new( "ae3f53d6-5de1-49ec-bd26-94e6aa69c42c" ) 
+--9x3
+obj_interactive_fant_offroad_wheel_10 = sm.uuid.new( "f0d579f8-89ac-49c8-b32d-cf0540cf950b" )  
+--9x4
+obj_interactive_fant_offroad_wheel_11 = sm.uuid.new( "af32f015-7f16-497b-9a6c-0bb43af52a52" )  
+--9x5
+obj_interactive_fant_offroad_wheel_12 = sm.uuid.new( "bc17e873-ffb9-42d7-a96b-bac8b4c4997f" )  
+
+
+-- Characters
+fant_straw_dog  			= sm.uuid.new( "a4abed62-f8ac-48e1-b21d-ec5964a69747" )  
+fant_straw_dog_body  		= sm.uuid.new( "0ddb5a69-3ccb-48e6-9db2-075dbec7a5bb" )  
+fant_straw_dog_eye  		= sm.uuid.new( "d04a98ff-a46d-453a-98ef-5b5aa6c80da2" )  
+fant_straw_dog_head  		= sm.uuid.new( "91049633-4395-490e-b046-90a99b47ad68" )  
+fant_straw_dog_jaw  		= sm.uuid.new( "cd7fdf7a-51e1-4c56-a4e7-fcc414d81cbe" )  
+fant_straw_dog_left_feet  	= sm.uuid.new( "f705b061-0238-4d35-a1e1-b54fd67a7855" )  
+fant_straw_dog_left_leg  	= sm.uuid.new( "ea6e899f-c0e8-44d0-badf-da142eea25b5" )  
+fant_straw_dog_right_feet  	= sm.uuid.new( "87a16afe-7cea-47d0-bfa5-b5655cb3d680" )  
+fant_straw_dog_right_leg  	= sm.uuid.new( "9539454a-e033-41ab-ba52-e524b220f6a2" )  
+fant_straw_dog_tail  		= sm.uuid.new( "6b26ba5d-3db2-4769-aef8-cf87f29bee71" )  
+
+-- Plantables
+obj_seed_eggplant = sm.uuid.new( "44b03130-28c6-4060-903f-9a96fb7f7fe0" )
+obj_plantables_eggplant = sm.uuid.new( "fae02274-5293-4f79-8727-6ca1d4e9a9e9" )
+
+-- 00Fant End
+
+
 ----------------------------------------
 -- appliances.json
 ----------------------------------------
@@ -618,7 +856,6 @@ obj_consumable_glue = sm.uuid.new( "36335664-6e61-4d44-9876-54f9660a8565" )
 -- robotparts.json
 ----------------------------------------
 obj_robotparts_tapebothead01 = sm.uuid.new( "1e89879f-1171-4bcd-9465-db7f740ab09e" )
-obj_robotparts_redtapebothead = sm.uuid.new( "d62ab46a-6d71-4858-85ba-c1a0e28e9abc" )
 obj_robotparts_tapebottorso01 = sm.uuid.new( "50380984-9ad6-4092-88e9-5a84b8212899" )
 obj_robotparts_tapebotleftarm01 = sm.uuid.new( "7faccb34-95df-4f3d-9250-054bb04b2719" )
 obj_robotparts_tapebotshooter = sm.uuid.new( "f293a245-2415-4da5-b012-01134652611f" )

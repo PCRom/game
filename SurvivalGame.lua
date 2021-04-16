@@ -19,8 +19,17 @@ SurvivalGame.enableUpgradeCost = true
 
 local SyncInterval = 400 -- 400 ticks | 10 seconds
 
+isSurvival = false
+g_characters = g_characters or {}
+Trees = Trees or {}
+Rocks = Rocks or {}
+Rods = Rods or {}
+Empty_Soils = Empty_Soils or {}
+Growing_Soils = Growing_Soils or {}
+Finish_Soils = Finish_Soils or {}
 
 function SurvivalGame.server_onCreate( self )
+	isSurvival = true
 	print( "SurvivalGame.server_onCreate" )
 	self.sv = {}
 	self.sv.saved = self.storage:load()
@@ -142,6 +151,8 @@ function SurvivalGame.client_onCreate( self )
 	-- Survival HUD
 	g_survivalHud = sm.gui.createSurvivalHudGui()
 	assert(g_survivalHud)
+	
+	self:bindChatCommands()
 end
 
 function SurvivalGame.bindChatCommands( self )
@@ -163,7 +174,7 @@ function SurvivalGame.bindChatCommands( self )
 	sm.game.bindChatCommand( "/limited", {}, "cl_onChatCommand", "Use the limited inventory" )
 	sm.game.bindChatCommand( "/unlimited", {}, "cl_onChatCommand", "Use the unlimited inventory" )
 	sm.game.bindChatCommand( "/ambush", { { "number", "magnitude", true }, { "int", "wave", true } }, "cl_onChatCommand", "Starts a 'random' encounter" )
-	--sm.game.bindChatCommand( "/recreate", {}, "cl_onChatCommand", "Recreate world" )
+	sm.game.bindChatCommand( "/recreate", {}, "cl_onChatCommand", "Recreate world" )
 	sm.game.bindChatCommand( "/timeofday", { { "number", "timeOfDay", true } }, "cl_onChatCommand", "Sets the time of the day as a fraction (0.5=mid day)" )
 	sm.game.bindChatCommand( "/timeprogress", { { "bool", "enabled", true } }, "cl_onChatCommand", "Enables or disables time progress" )
 	sm.game.bindChatCommand( "/day", {}, "cl_onChatCommand", "Disable time progression and set time to daytime" )
@@ -196,14 +207,31 @@ function SurvivalGame.bindChatCommands( self )
 
 	sm.game.bindChatCommand( "/activatequest",  { { "string", "uuid", true } }, "cl_onChatCommand", "Activate quest" )
 	sm.game.bindChatCommand( "/completequest",  { { "string", "uuid", true } }, "cl_onChatCommand", "Complete quest" )
+
+	
+			-- 00Fant´s code Start
+	sm.game.bindChatCommand( "/all", {}, "cl_onChatCommand", "cheatmode" )
+	sm.game.bindChatCommand( "/delete", {}, "cl_onChatCommand", "delete" )
+	sm.game.bindChatCommand( "/del", {}, "cl_onChatCommand", "delete" )
+	sm.game.bindChatCommand( "/undo", {}, "cl_onChatCommand", "undo" )
+	sm.game.bindChatCommand( "/fly", {}, "cl_onChatCommand", "fly" )
+	sm.game.bindChatCommand( "/clearinv", {}, "cl_onChatCommand", "clear" )
+	sm.game.bindChatCommand( "/chunk", {}, "cl_onChatCommand", "chunk" )
+	sm.game.bindChatCommand( "/field", { { "int", "x", true }, { "int", "y", true } }, "cl_onChatCommand", "field" )
+	sm.game.bindChatCommand( "/cleanup",  { { "int", "radius", true } }, "cl_onChatCommand", "cleanup" )
+	sm.game.bindChatCommand( "/cam", { { "int", "toggle", true } }, "cl_onChatCommand", "Camera lock" )
+	sm.game.bindChatCommand( "/camself", { { "int", "toggle", true } }, "cl_onChatCommand", "Camera lock" )
+	sm.game.bindChatCommand( "/fill", { { "string", "type", true } }, "cl_onChatCommand", "Aim at a Container and use the Command on it. /fill or /fill ammo, gas, batterie, fuel, chemical, potato, water or the short variants like /fill am, ga, ch, wa, po" )
+
+	-- 00Fant´s code End
 end
 
 function SurvivalGame.client_onClientDataUpdate( self, clientData )
 	self.cl.time = clientData.time
 
-	if not g_survivalDev and clientData.dev and not sm.isHost then
-		self:bindChatCommands()
-	end
+	-- if not g_survivalDev and clientData.dev and not sm.isHost then
+		-- self:bindChatCommands()
+	-- end
 
 	g_survivalDev = clientData.dev
 end
@@ -257,6 +285,15 @@ function SurvivalGame.server_onFixedUpdate( self, timeStep )
 	g_elevatorManager:sv_onFixedUpdate()
 	g_unitManager:sv_onFixedUpdate()
 	g_questManager:sv_onFixedUpdate()
+	
+	for k, character in pairs(g_characters) do
+		if character:isSwimming() == false then
+			character:setSwimming( self.fly )
+		end
+		if character:isDiving() == false then
+			character:setDiving( self.fly )
+		end
+	end
 end
 
 function SurvivalGame.sv_updateClientData( self )
@@ -285,6 +322,24 @@ function SurvivalGame.client_onUpdate( self, dt )
 		light = DAYCYCLE_LIGHTING_VALUES[index]
 	end
 	sm.render.setOutdoorLighting( light )
+	
+	if self.camModeSelf then
+		local DirectionVector = sm.localPlayer.getPlayer().character.worldPosition - sm.camera.getPosition()
+		local Distance = sm.vec3.length( DirectionVector )
+		local DirectionNormalized = sm.vec3.normalize( DirectionVector )
+		if DirectionNormalized == sm.vec3.new( 0, 0, 0 ) then
+			DirectionNormalized = sm.vec3.new( 1, 0, 0 )
+		end
+		sm.camera.setDirection( sm.vec3.lerp( sm.camera.getDirection(), DirectionNormalized, dt * 25 ) )
+		if Distance > 5 then
+			local NewPos =  sm.localPlayer.getPlayer().character.worldPosition - DirectionNormalized * 4
+			NewPos.z = sm.localPlayer.getPlayer().character.worldPosition.z + 3
+			self.camSelfPos = NewPos
+		end
+		if self.camSelfPos ~= nil then
+			sm.camera.setPosition(  sm.vec3.lerp( sm.camera.getPosition(),  self.camSelfPos, ( dt * ( Distance / 25 ) * 3 ) / 2 ) )
+		end
+	end
 end
 
 function SurvivalGame.client_showMessage( self, params )
@@ -418,10 +473,335 @@ function SurvivalGame.cl_onChatCommand( self, params )
 		else
 			self.network:sendToServer( "sv_n_switchAggroMode", { aggroMode = not sm.game.getEnableAggro() } )
 		end
+	
+		-- 00Fant´s code Start
+	elseif params[1] == "/all" then
+		self.network:sendToServer( "sv_switchGodMode" )
+		self.network:sendToServer( "sv_setLimitedInventory", false )
+		self.network:sendToServer( "sv_setTimeOfDay", 0.5 )
+		self.network:sendToServer( "sv_setTimeProgress", false )
+		--self.network:sendToServer( "sv_enableRestrictions", false )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = tool_spudgun, quantity = 1 } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = tool_connect, quantity = 1 } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = tool_weld, quantity = 1 } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = tool_paint, quantity = 1 } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = tool_shotgun, quantity = 1 } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = tool_gatling, quantity = 1 } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = obj_plantables_potato, quantity = ( 50 ) } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = obj_consumable_gas, quantity = ( 20 ) } )
+		--self.network:sendToServer( "sv_giveItem", { player = sm.localPlayer.getPlayer(), item = obj_consumable_battery, quantity = ( 20 ) } )
+	elseif params[1] == "/delete" or params[1] == "/del" then
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast( 100 )
+		if rayCastValid and rayCastResult.type == "body" then
+			local importParams = {
+				name = "undo",
+				body = rayCastResult:getBody()
+			}
+			self.network:sendToServer( "sv_exportCreation", importParams )
+			
+			importParams = {
+				name = params[2],
+				body = rayCastResult:getBody()
+			}
+			self.network:sendToServer( "sv_delete", importParams )
+		end
+	elseif params[1] == "/fill" then
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast( 100 )
+		if rayCastValid then
+			local raycastShape = rayCastResult:getShape()
+			if raycastShape ~= nil then
+				self.network:sendToServer( "sv_fill", { shape = rayCastResult:getShape(), filltype = params[2] } )
+			end
+		end
+	elseif params[1] == "/undo" then
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast( 100 )
+		if rayCastValid then
+			local importParams = {
+				world = sm.localPlayer.getPlayer().character:getWorld(),
+				name = "undo",
+				position = rayCastResult.pointWorld
+			}
+			self.network:sendToServer( "sv_importCreation", importParams )
+		end
+	elseif params[1] == "/fly" then
+		self.network:sendToServer( "sv_fly", { character = sm.localPlayer.getPlayer().character } )
+		
+	elseif params[1] == "/clearinv" then
+		local isLimited = sm.game.getLimitedInventory()
+		self.network:sendToServer( "sv_setLimitedInventory", true )
+		self.network:sendToServer( "sv_clear", { player = sm.localPlayer.getPlayer() } )
+		self.network:sendToServer( "sv_setLimitedInventory", isLimited )
+		sm.gui.displayAlertText( "Open Close Inventory to Refresh your Hotbar", 2 )
+	
+	elseif params[1] == "/chunk" then
+		local rayCastValid, rayCastResult = sm.localPlayer.getRaycast( 100 )
+		self.network:sendToServer( "sv_chunk", { sm.localPlayer.getPlayer(), sm.localPlayer.getPlayer().character:getWorld(), rayCastResult.pointWorld } )
+		sm.gui.displayAlertText( "After a Map reload the Chunk Clone Loader are Gone!", 2 )
+			
+	elseif params[1] == "/field" then
+		local SizeX = 0
+		if params[2] ~= nil then
+			SizeX = params[2]
+		end
+		local SizeY = 0
+		if params[3] ~= nil then
+			SizeY = params[3]
+		else
+			SizeY = SizeX
+		end
+		local halfSizeX = math.floor( SizeX / 2 )
+		if halfSizeX < 0 then
+			halfSizeX = 0
+		end
+		local halfSizeY = math.floor( SizeY / 2 )
+		if halfSizeY < 0 then
+			halfSizeY = 0
+		end
+
+		local RayPosDefault = sm.localPlayer.getPlayer().character.worldPosition + sm.vec3.new( 0, 0, 10 )
+		local RayDirection = sm.vec3.new( 0, 0, -1 ) * 100
+		local SoilData = {}
+		for X = -halfSizeX, halfSizeX do 
+			for Y = -halfSizeY, halfSizeY do 
+				local RayCastPos = self:getLocalBlockGridPosition( RayPosDefault + ( sm.vec3.new( X, Y, 0 ) * 0.75 )  )
+				local valid, result = sm.localPlayer.getRaycast( 100, RayCastPos, RayDirection )
+				if result then
+					if result.type == "terrainSurface" then
+						if result.normalWorld.z >= 0.97236992 then
+							table.insert( SoilData, result.pointWorld )
+						end
+					end
+				end
+			end
+		end
+		self.network:sendToServer( "PlaceSoilField", { player = sm.localPlayer.getPlayer(), data = SoilData } )
+	elseif params[1] == "/cleanup" then
+		if params[2] ~= nil then
+			self.network:sendToServer( "cleanup", { player = sm.localPlayer.getPlayer(), radius = params[2] } )
+		end
+	elseif params[1] == "/cam" then
+		if self.camMode == nil then
+			self.camMode = false
+		end
+		if not self.camMode then
+			local pos = sm.camera.getPosition( ) 
+			local dir = sm.camera.getDirection( ) 
+			sm.camera.setCameraState( sm.camera.state.cutsceneTP )
+			sm.camera.setPosition( pos )
+			sm.camera.setDirection( dir )
+			self.camMode = true
+			self.camModeSelf = false
+		else
+			sm.camera.setCameraState( sm.camera.state.default )
+			self.camMode = false
+			self.camModeSelf = false
+		end
+	elseif params[1] == "/camself" then
+		if self.camModeSelf == nil then
+			self.camModeSelf = false
+		end
+		if not self.camModeSelf then
+			local dir = sm.camera.getDirection( ) 
+			local pos = sm.camera.getPosition( )
+			sm.camera.setCameraState( sm.camera.state.cutsceneTP )
+			sm.camera.setPosition( pos )
+			sm.camera.setDirection( dir )
+			self.camModeSelf = true
+			self.camMode = false
+			self.camSelfPos = pos
+		else
+			sm.camera.setCameraState( sm.camera.state.default )
+			self.camModeSelf = false
+			self.camMode = false
+		end
+		-- 00Fant´s code End
 	else
 		self.network:sendToServer( "sv_onChatCommand", params )
 	end
 end
+
+-- 00Fant´s code Start
+
+function SurvivalGame.sv_fill( self, params )
+	local filltype = "all"
+	if params.filltype ~= nil then
+		if params.filltype:lower():match( "ga" ) then
+			filltype = "gas"
+		end
+		if params.filltype:lower():match( "fu" ) then
+			filltype = "gas"
+		end
+		if params.filltype:lower():match( "wa" ) then
+			filltype = "water"
+		end
+		if params.filltype:lower():match( "ba" ) then
+			filltype = "batterie"
+		end
+		if params.filltype:lower():match( "am" ) then
+			filltype = "ammo"
+		end
+		if params.filltype:lower():match( "po" ) then
+			filltype = "ammo"
+		end
+		if params.filltype:lower():match( "ch" ) then
+			filltype = "chemicals"
+		end	
+	end
+	
+	local Quantitys = {
+		1000,
+		500,
+		250,
+		100,
+		50,
+		25,
+		10,
+		1
+	}
+	if filltype == "all" then
+		Quantitys = {
+			50,
+			25,
+			10,
+			1
+		}
+	end
+	local interactable = sm.shape.getInteractable( params.shape ) 
+	local container = sm.interactable.getContainer( interactable, 0 )
+	if container then
+		for index, Quantity in pairs( Quantitys ) do
+			for loop = 0, 20 do
+				if sm.container.canCollect( container, obj_consumable_gas, Quantity ) and ( filltype == "all" or filltype == "gas" ) then
+					sm.container.beginTransaction()
+					sm.container.collect( container, obj_consumable_gas, Quantity, true )	
+					if sm.container.endTransaction() then	
+					end		
+				end
+				if sm.container.canCollect( container, obj_consumable_battery, Quantity ) and ( filltype == "all" or filltype == "batterie" )  then	
+					sm.container.beginTransaction()
+					sm.container.collect( container, obj_consumable_battery, Quantity, true )	
+					if sm.container.endTransaction() then					
+					end		
+				end
+				if sm.container.canCollect( container, obj_plantables_potato, Quantity ) and ( filltype == "all" or filltype == "ammo" )  then	
+					sm.container.beginTransaction()
+					sm.container.collect( container, obj_plantables_potato, Quantity, true )	
+					if sm.container.endTransaction() then				
+					end		
+				end
+				if sm.container.canCollect( container, obj_consumable_water, Quantity ) and ( filltype == "all" or filltype == "water" )  then	
+					sm.container.beginTransaction()
+					sm.container.collect( container, obj_consumable_water, Quantity, true )	
+					if sm.container.endTransaction() then				
+					end		
+				end
+				if sm.container.canCollect( container, obj_consumable_chemical, Quantity ) and ( filltype == "all" or filltype == "chemicals" )  then	
+					sm.container.beginTransaction()
+					sm.container.collect( container, obj_consumable_chemical, Quantity, true )	
+					if sm.container.endTransaction() then				
+					end		
+				end
+			end
+		end
+	end
+end
+
+function SurvivalGame.cleanup( self, params )
+	sm.event.sendToPlayer( params.player, "Cleanup", params.radius )
+end
+
+function SurvivalGame.getLocalBlockGridPosition( self, pos )
+	local size = sm.vec3.new( 3, 3, 1 )
+	local size_2 = sm.vec3.new( 1, 1, 0 )
+	local a = pos * sm.construction.constants.subdivisions
+	local gridPos = sm.vec3.new( math.floor( a.x ), math.floor( a.y ), a.z ) - size_2
+	return gridPos * sm.construction.constants.subdivideRatio + ( size * sm.construction.constants.subdivideRatio ) * 0.5
+end
+
+function SurvivalGame.PlaceSoilField( self, params )
+	print( "Create Field!" )
+	for i, k in pairs( params.data ) do 
+		if k ~= nil then
+			sm.event.sendToPlayer( params.player, "PlaceSoil", k )
+		end
+	end
+end
+
+function SurvivalGame.sv_chunk( self, params )
+	sm.character.createCharacter( params[1],params[2], params[3], params[1].character["id"] ) 
+end
+
+function SurvivalGame.sv_delete( self, params )
+	local shapes = sm.body.getCreationShapes( params.body )
+	for i, shape in ipairs(shapes) do 
+		sm.shape.destroyShape( shape, 0 )
+	end
+end
+
+function SurvivalGame.sv_fly( self, data )
+	if self.fly == nil then
+		self.fly = false
+	end
+	if self.fly == true then
+		self.fly = false
+		self.network:sendToClients( "remove_from_g_characters", data.character )
+	else
+		self.fly = true
+		self.network:sendToClients( "add_to_g_characters", data.character )
+	end	
+	data.character:setSwimming( self.fly )
+	data.character:setDiving( self.fly )
+	print( "Fly Mode: " ..tostring( self.fly ) )
+end
+
+function SurvivalGame.add_to_g_characters( self, character )
+	self.fly = true
+	local hasPly = false
+	for k, g_character in pairs(g_characters) do
+		if g_character == character then
+			hasPly = true
+		end
+	end
+	if hasPly == false then
+		table.insert( g_characters, character )
+		sm.gui.displayAlertText( "If the Flymode has not worked, try it again. (lag reason)" )
+	end
+end
+
+function SurvivalGame.remove_from_g_characters( self, character )
+	local newPlayers = {}
+	for k, g_character in pairs(g_characters) do
+		if g_character ~= character then
+			table.insert( newPlayers, g_character )
+		end
+	end
+	self.fly = false
+	g_characters = newPlayers
+end
+
+function SurvivalGame.sv_clear( self, data )
+	local inventory = data.player:getInventory()
+	local size = inventory:getSize()
+	local lostItems = {}
+	print( size )
+	for i = 0, size do
+		local item = inventory:getItem( i )
+		if item.uuid ~= sm.uuid.getNil() then
+			item.slot = i
+			lostItems[#lostItems+1] = item
+		end
+	end
+
+	if #lostItems > 0 then
+		if sm.container.beginTransaction() then
+			for i, item in ipairs( lostItems ) do
+				sm.container.spendFromSlot( inventory, item.slot, item.uuid, item.quantity, true )
+			end		
+			sm.container.endTransaction()
+		end
+	end
+end
+-- 00Fant´s code End
 
 function SurvivalGame.sv_giveItem( self, params )
 	sm.container.beginTransaction()

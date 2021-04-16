@@ -5,10 +5,11 @@ TapeBotCharacter = class( Character )
 
 local alertRenderableTp = "$SURVIVAL_DATA/Character/Char_Tapebot/char_tapebot_alert.rend"
 local roamingRenderableTp = "$SURVIVAL_DATA/Character/Char_Tapebot/char_tapebot_roaming.rend"
-sm.character.preloadRenderables( { alertRenderableTp, roamingRenderableTp } )
 
 local alertMovementEffects = "$SURVIVAL_DATA/Character/Char_Tapebot/alert_movement_effects.json"
 local roamingMovementEffects = "$SURVIVAL_DATA/Character/Char_Tapebot/roaming_movement_effects.json"
+
+sm.tool.preloadRenderables( { alertRenderableTp, roamingRenderableTp } )
 
 function TapeBotCharacter.client_onCreate( self )
 
@@ -76,7 +77,10 @@ function TapeBotCharacter.cl_initAnimationSwitch( self )
 	self.cl.currentSwitch = ""
 end
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_robotdetector.lua"
+
 function TapeBotCharacter.client_onUpdate( self, deltaTime )
+	ShowUnitInfo( self, deltaTime, "Tapebot" )
 	if not self.graphicsLoaded then
 		return
 	end

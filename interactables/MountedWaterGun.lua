@@ -10,9 +10,37 @@ MountedWaterGun.colorHighlight = sm.color.new( 0xee0a00ff )
 MountedWaterGun.poseWeightCount = 1
 
 local FireDelay = 8 --ticks
-local MinForce = 8.0
-local MaxForce = 12.0
+local MinForce = 30.0 -- 8.0
+local MaxForce = 50.0 -- 12.0
 local SpreadDeg = 5.0
+
+
+
+-- 00Fant
+Maximum_Water_Force = 10000
+
+--00Fant start
+
+function IsInWater(self)
+	if not self.sv.areaTrigger then
+		self.sv.areaTrigger = sm.areaTrigger.createAttachedBox( self.interactable, sm.vec3.new( 0.5, 0.5, 0.5 ), sm.vec3.new(0.0, 0, 0.0), sm.quat.identity(), sm.areaTrigger.filter.all )			
+		--self.sv.areaTrigger:bindOnProjectile( "trigger_onProjectile", self )
+	end
+	--print( self.sv.areaTrigger:getContents() )
+	for _, result in ipairs(  self.sv.areaTrigger:getContents() ) do
+		if sm.exists( result ) then
+			if type( result ) == "AreaTrigger" then
+				local userData = result:getUserData()
+				if userData and userData.water == true then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
+--00Fant end
 
 
 --[[ Server ]]
@@ -75,15 +103,16 @@ end
 
 function MountedWaterGun.sv_fire( self )
 	self.sv.canFire = false
-	local firePos = sm.vec3.new( 0.0, 0.0, 0.375 )
-	local fireForce = math.random( MinForce, MaxForce )
+	if not IsInWater(self) then
+		local firePos = sm.vec3.new( 0.0, 0.0, 0.375 )
+		local fireForce = math.random( MinForce, MaxForce )
 
-	-- Add random spread
-	local dir = sm.noise.gunSpread( sm.vec3.new( 0.0, 0.0, 1.0 ), SpreadDeg )
+		-- Add random spread
+		local dir = sm.noise.gunSpread( sm.vec3.new( 0.0, 0.0, 1.0 ), SpreadDeg )
 
-	-- Fire projectile from the shape
-	sm.projectile.shapeFire( self.shape, "water", firePos, dir * fireForce )
-
+		-- Fire projectile from the shape
+		sm.projectile.shapeFire( self.shape, "water", firePos, dir * fireForce )
+	end
 	self.network:sendToClients( "cl_onShoot" )
 end
 
@@ -122,7 +151,16 @@ end
 function MountedWaterGun.cl_onShoot( self )
 	self.cl.boltValue = 1.0
 	self.cl.shootEffect:start()
-	local impulse = sm.vec3.new( 0, 0, -1 ) * 500
+	--00Fant start
+	ImpulseForce = 500
+
+	if IsInWater(self) then
+		ImpulseForce = Maximum_Water_Force	
+	end
+	
+	local impulse = sm.vec3.new( 0, 0, -1 ) * ImpulseForce
+	--00Fant end
+	
 	sm.physics.applyImpulse( self.shape, impulse )
 end
 

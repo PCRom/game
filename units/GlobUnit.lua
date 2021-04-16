@@ -3,6 +3,11 @@ dofile "$SURVIVAL_DATA/Scripts/util.lua"
 dofile( "$SURVIVAL_DATA/Scripts/game/util/Timer.lua" )
 dofile "$SURVIVAL_DATA/Scripts/game/units/states/PathingState.lua"
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_tesla_coil.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/weapons/Fant_ElectroHammer/Fant_ElectroHammer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_flamethrower.lua"
+
 GlobUnit = class( nil )
 
 local RoamStartTimeMin = 40 * 10 -- 10 seconds
@@ -30,10 +35,17 @@ function GlobUnit.server_onCreate( self )
 		if self.params.deathTick then
 			self.saved.deathTickTimestamp = self.params.deathTick
 		end
+		if self.params.color then
+			self.saved.color = self.params.color
+		end
 	end
 	if not self.homePosition then
 		self.homePosition = self.unit.character.worldPosition
 	end
+	if self.saved.color then
+		self.unit.character:setColor( self.saved.color )
+	end
+	
 	if not self.saved.deathTickTimestamp then
 		self.saved.deathTickTimestamp = sm.game.getCurrentTick() + DaysInTicks( 30 )
 	end
@@ -91,6 +103,9 @@ function GlobUnit.server_onDestroy( self )
 end
 
 function GlobUnit.server_onFixedUpdate( self, dt )
+	ProcessTeslaDamage( self, false )
+	FlamethrowerDamage( self, dt )
+	
 
 	if sm.exists( self.unit ) and not self.destroyed then
 		if self.saved.deathTickTimestamp and sm.game.getCurrentTick() >= self.saved.deathTickTimestamp then
@@ -226,7 +241,9 @@ function GlobUnit.server_onProjectile( self, hitPos, hitTime, hitVelocity, proje
 			self.unit:sendCharacterEvent( "hit" )
 		end
 	end
-
+	if projectileName == "water" then
+		ExtinguishFire( self )
+	end
 	self:sv_takeDamage( damage )
 end
 
@@ -239,7 +256,7 @@ function GlobUnit.server_onMelee( self, hitPos, attacker, damage, power )
 		self.fleeFrom = attacker
 		self.unit:sendCharacterEvent( "hit" )
 	end
-
+	GetMeleeHit( self, attacker )
 	self:sv_takeDamage( damage )
 	local attackDirection = ( hitPos - attackingCharacter.worldPosition ):normalize()
 	ApplyKnockback( self.unit.character, attackDirection, power * 0.5 )
@@ -317,6 +334,16 @@ function GlobUnit.sv_onDeath( self )
 	end
 end
 
-function GlobUnit.sv_e_onEnterWater( self ) end
+function GlobUnit.sv_e_onEnterWater( self )
+	ExtinguishFire( self )
+end
 
 function GlobUnit.sv_e_onStayWater( self ) end
+
+
+function GlobUnit.server_onCharacterChangedColor( self, color )
+	if self.saved.color ~= color then
+		self.saved.color = color
+		self.storage:save( self.saved )
+	end
+end

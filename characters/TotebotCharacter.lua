@@ -4,7 +4,6 @@ TotebotCharacter = class( Character )
 
 local alertRenderableTp = "$SURVIVAL_DATA/Character/Char_Totebot/char_totebot_alert.rend"
 local roamingRenderableTp = "$SURVIVAL_DATA/Character/Char_Totebot/char_totebot_roaming.rend"
-sm.character.preloadRenderables( { alertRenderableTp, roamingRenderableTp } )
 
 function TotebotCharacter.client_onCreate( self )
 	self.cl = {}
@@ -97,7 +96,12 @@ function TotebotCharacter.cl_initAnimationSwitch( self )
 	self.cl.currentSwitch = ""
 end
 
+local UnitName = "TotebotGreen"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_robotdetector.lua"
+
 function TotebotCharacter.client_onUpdate( self, deltaTime )
+	ShowUnitInfo( self, deltaTime, UnitName )
+
 	if not self.graphicsLoaded then
 		return
 	end

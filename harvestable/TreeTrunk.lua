@@ -4,13 +4,20 @@ dofile "$SURVIVAL_DATA/Scripts/game/survival_constants.lua"
 
 TreeTrunk = class( nil )
 
-local SelfdestructTickTime = 40 * 22
-local TrunkHealth = 100
-local DamagerPerHit = math.ceil( TrunkHealth / TREE_TRUNK_HITS )
+SelfdestructTickTime = 40 * 22
+TrunkHealth = 100
+DamagerPerHit = math.ceil( TrunkHealth / TREE_TRUNK_HITS )
 
 -- Server
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function TreeTrunk.server_onDestroy( self )
+	g_remove_Tree( self )
+end
+
+
 function TreeTrunk.server_onCreate( self )
+	g_add_Tree( self )
 	self:sv_init()
 	
 	if self.params then
@@ -103,7 +110,7 @@ function TreeTrunk.server_onMelee( self, position, attacker, damage )
 			if type( attacker ) == "Player" then
 				self.network:sendToClient( attacker, "cl_n_onMessage", "#{ALERT_TREE_TOO_BIG}" )
 			end
-			if g_survivalDev or type( attacker ) == "Unit" then
+			if g_survivalDev then
 				self:sv_onHit( DamagerPerHit )
 			end
 		end
@@ -147,14 +154,12 @@ function TreeTrunk.sv_onHit( self, damage )
 	end
 end
 
-function TreeTrunk.server_onExplosion( self, center, destructionLevel )
-	self:sv_onHit( destructionLevel * DamagerPerHit, center )
-end
-
 function TreeTrunk.server_onCollision( self, other, collisionPosition, selfPointVelocity, otherPointVelocity, collisionNormal )	
 	
 	if type( other ) == "Shape" and sm.exists( other ) then
-		if other.shapeUuid == obj_powertools_sawblade then
+		--00Fant start
+		if other.shapeUuid == obj_powertools_sawblade or other.shapeUuid == obj_powertools_fant_drill or other.shapeUuid == obj_powertools_fant_drill_small or other.shapeUuid == obj_powertools_fant_drill_large then
+		--00Fant end
 			local angularVelocity = other.body.angularVelocity
 			if angularVelocity:length() > SPINNER_ANGULAR_THRESHOLD then
 				local damage = 2.5

@@ -11,6 +11,12 @@ dofile "$SURVIVAL_DATA/Scripts/game/survival_constants.lua"
 dofile "$SURVIVAL_DATA/Scripts/util.lua"
 
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_tesla_coil.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/weapons/Fant_ElectroHammer/Fant_ElectroHammer.lua"
+dofile( "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua" )
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_flamethrower.lua"
+
 FarmbotUnit = class( nil )
 
 local RoamStartTimeMin = 40 * 4 -- 4 seconds
@@ -45,7 +51,7 @@ function FarmbotUnit.server_onCreate( self )
 		self.saved = {}
 	end
 	if self.saved.stats == nil then
-		self.saved.stats = { hp = 1600, maxhp = 1600 }
+		self.saved.stats = { hp = 1200, maxhp = 1200 }
 	end
 
 	if self.params then
@@ -142,7 +148,7 @@ function FarmbotUnit.server_onCreate( self )
 	self.attackState02 = self.unit:createState( "meleeAttack" )
 	self.attackState02.meleeType = "FarmbotSwipe"
 	self.attackState02.event = "walkingswipe"
-	self.attackState02.damage = 35
+	self.attackState02.damage = 20
 	self.attackState02.attackRange = 3.75
 	self.attackState02.animationCooldown = 1.86 * 40
 	self.attackState02.attackCooldown = 3.0 * 40
@@ -152,7 +158,7 @@ function FarmbotUnit.server_onCreate( self )
 	self.attackState03 = self.unit:createState( "meleeAttack" )
 	self.attackState03.meleeType = "FarmbotSwipe"
 	self.attackState03.event = "standingswipe"
-	self.attackState03.damage = 35
+	self.attackState03.damage = 20
 	self.attackState03.attackRange = 3.75
 	self.attackState03.animationCooldown = 1.86 * 40
 	self.attackState03.attackCooldown = 1.75 * 40
@@ -162,7 +168,7 @@ function FarmbotUnit.server_onCreate( self )
 	self.attackPartState = self.unit:createState( "meleeAttack" )
 	self.attackPartState.meleeType = "FarmbotBreach"
 	self.attackPartState.event = "breachattack"
-	self.attackPartState.damage = 60
+	self.attackPartState.damage = 30
 	self.attackPartState.attackRange = 3.75
 	self.attackPartState.animationCooldown = 3.66 * 40
 	self.attackPartState.attackCooldown = 4.5 * 40
@@ -172,7 +178,7 @@ function FarmbotUnit.server_onCreate( self )
 	self.attackState05 = self.unit:createState( "meleeAttack" )
 	self.attackState05.meleeType = "FarmbotSwipe"
 	self.attackState05.event = "runningswipe"
-	self.attackState05.damage = 35
+	self.attackState05.damage = 15
 	self.attackState05.attackRange = 3.75
 	self.attackState05.animationCooldown = 1.86 * 40
 	self.attackState05.attackCooldown = 8.0 * 40
@@ -308,6 +314,9 @@ function FarmbotUnit.server_onDestroy( self )
 end
 
 function FarmbotUnit.server_onFixedUpdate( self, dt )
+	ProcessTeslaDamage( self, false )
+	FlamethrowerDamage( self, dt )
+	
 	if sm.exists( self.unit ) and not self.destroyed then
 		if self.saved.deathTickTimestamp and sm.game.getCurrentTick() >= self.saved.deathTickTimestamp then
 			self.unit:destroy()
@@ -470,7 +479,7 @@ function FarmbotUnit.server_onUnitUpdate( self, dt )
 	local closestVisibleWormCharacter
 	local closestVisibleCrop
 	local closestVisibleTeamOpponent
-	if not SurvivalGame then
+	if not isSurvival then
 		closestVisibleTeamOpponent = sm.ai.getClosestVisibleTeamOpponent( self.unit, self.unit.character:getColor() )
 	end
 	closestVisiblePlayerCharacter = sm.ai.getClosestVisiblePlayerCharacter( self.unit )
@@ -507,7 +516,7 @@ function FarmbotUnit.server_onUnitUpdate( self, dt )
 			if sm.exists( allyUnit ) and self.unit ~= allyUnit and allyUnit.character and isAnyOf( allyUnit.character:getCharacterType(), g_robots ) and InSameWorld( self.unit, allyUnit) then
 				if ( allyUnit.character.worldPosition - self.unit.character.worldPosition ):length() <= AllyRange then
 					local sameTeam = true
-					if not SurvivalGame then
+					if not isSurvival then
 						sameTeam = InSameTeam( allyUnit, self.unit )
 					end
 					if sameTeam then
@@ -849,9 +858,13 @@ function FarmbotUnit.server_onProjectile( self, hitPos, hitTime, hitVelocity, pr
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	
+	if projectileName == "water" then
+		ExtinguishFire( self )
+	end
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -875,9 +888,10 @@ function FarmbotUnit.server_onMelee( self, hitPos, attacker, damage )
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	GetMeleeHit( self, attacker )
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -916,7 +930,7 @@ function FarmbotUnit.server_onCollision( self, other, collisionPosition, selfPoi
 			return
 		end
 		local teamOpponent = false
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( other, self.unit )
 		end
 		if other:isPlayer() or teamOpponent then
@@ -958,11 +972,11 @@ function FarmbotUnit.server_onCollision( self, other, collisionPosition, selfPoi
 	if tumbleTicks > 0 then
 		if self.currentState ~= self.destroyedEventState then
 			self.unit:sendCharacterEvent( "tumble" )
-			if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
-				if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
-					sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
-				end
-			end
+			-- if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
+				-- if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
+					-- sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
+				-- end
+			-- end
 		end
 	end
 end
@@ -1003,7 +1017,7 @@ function FarmbotUnit.sv_onDeath( self )
 		-- Create explosion
 		sm.physics.explode( character.worldPosition, 7, 2, 6, 25, "Farmbot - Destroyed", nil, { Color = self.unit.character:getColor() } )
 		self:sv_spawnParts()
-		if SurvivalGame then
+		if isSurvival then
 			local loot = SelectLoot( "loot_farmbot" )
 			SpawnLoot( self.unit, loot )
 		end
@@ -1048,7 +1062,7 @@ function FarmbotUnit.sv_e_receiveTarget( self, params )
 	if self.unit ~= params.unit then
 		if self.eventTarget == nil then
 			local sameTeam = false
-			if not SurvivalGame then
+			if not isSurvival then
 				sameTeam = InSameTeam( params.targetCharacter, self.unit )
 			end
 			if not sameTeam then
@@ -1058,6 +1072,8 @@ function FarmbotUnit.sv_e_receiveTarget( self, params )
 	end
 end
 
-function FarmbotUnit.sv_e_onEnterWater( self ) end
+function FarmbotUnit.sv_e_onEnterWater( self )
+	ExtinguishFire( self )
+end
 
 function FarmbotUnit.sv_e_onStayWater( self ) end

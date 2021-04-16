@@ -10,7 +10,6 @@ local multiknifeRenderableTp = "$GAME_DATA/Character/Char_Tools/Char_multiknife/
 local multiknifeRenderableFp = "$GAME_DATA/Character/Char_Tools/Char_multiknife/char_multiknife_fp.rend"
 
 local baguetteRenderableTp = "$SURVIVAL_DATA/Character/Char_Tools/Char_longsandwich/char_male_headsandwich.rend"
-sm.character.preloadRenderables( { multiknifeRenderableTp, baguetteRenderableTp } )
 
 function MechanicCharacter.server_onCreate( self )
 	local player = self.character:getPlayer()

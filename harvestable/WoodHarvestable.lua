@@ -7,7 +7,15 @@ WoodHarvestable = class( nil )
 local TrunkHealth = 100
 local DamagerPerHit = math.ceil( TrunkHealth / TREE_TRUNK_HITS )
 
+
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function WoodHarvestable.server_onDestroy( self )
+	g_remove_Tree( self )
+end
+
 function WoodHarvestable.server_onCreate( self )
+	g_add_Tree( self )
 	self:sv_init()
 end
 
@@ -54,7 +62,6 @@ function WoodHarvestable.client_onMelee( self, hitPos, attacker, damage )
 end
 
 function WoodHarvestable.sv_onHit( self, damage, position )	
-	
 	if not sm.exists( self.harvestable ) or self.destroyed then
 		return
 	end
@@ -163,12 +170,18 @@ function WoodHarvestable.cl_n_onMessage( self, msg )
 end
 
 function WoodHarvestable.server_onExplosion( self, center, destructionLevel )
-	self:sv_onHit( destructionLevel * DamagerPerHit, center )
+	if self.data then
+		if self.data.type == "small" or self.data.type == "medium" then
+			self:sv_onHit( destructionLevel * DamagerPerHit, center )
+		end
+	end
 end
 
 function WoodHarvestable.server_onCollision( self, other, collisionPosition, selfPointVelocity, otherPointVelocity, collisionNormal )
 	if type( other ) == "Shape" and sm.exists( other ) then
-		if other.shapeUuid == obj_powertools_sawblade then
+		--00Fant start
+		if other.shapeUuid == obj_powertools_sawblade or other.shapeUuid == obj_powertools_fant_drill or other.shapeUuid == obj_powertools_fant_drill_small or other.shapeUuid == obj_powertools_fant_drill_large then
+		--00Fant end
 			local angularVelocity = other.body.angularVelocity
 			if angularVelocity:length() > SPINNER_ANGULAR_THRESHOLD then
 				local damage = math.min( 2.5, angularVelocity:length() )

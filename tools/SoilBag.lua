@@ -1,6 +1,7 @@
 dofile "$GAME_DATA/Scripts/game/AnimationUtil.lua"
 dofile "$SURVIVAL_DATA/Scripts/util.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_shapes.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua"
 
 SoilBag = class()
 
@@ -268,14 +269,22 @@ function SoilBag.client_onUnequip( self )
 end
 
 function SoilBag.sv_n_putSoil( self, params, player )
-	sm.container.beginTransaction()
-	sm.container.spendFromSlot( player:getInventory(), params.slot, obj_consumable_soilbag, 1 )
-	if sm.container.endTransaction() then
-		local rot = math.random( 0, 3 ) * math.pi * 0.5
-		sm.harvestable.create( hvs_soil, params.pos, sm.quat.angleAxis( rot, sm.vec3.new( 0, 0, 1 ) ) * sm.quat.new( 0.70710678, 0, 0, 0.70710678 ) )
-		sm.effect.playEffect( "Plants - SoilbagUse", params.pos, nil, sm.quat.angleAxis( rot, sm.vec3.new( 0, 0, 1 ) ) * sm.quat.new( 0.70710678, 0, 0, 0.70710678 ) )
-		self.network:sendToClients( "cl_n_putSoil", params )
+	if not sm.game.getLimitedInventory() then
+		self:PlaceSoil( params, player )
+	else
+		sm.container.beginTransaction()
+		sm.container.spendFromSlot( player:getInventory(), params.slot, obj_consumable_soilbag, 1 )
+		if sm.container.endTransaction() then
+			self:PlaceSoil( params, player )
+		end
 	end
+end
+
+function SoilBag.PlaceSoil( self, params, player )
+	local rot = math.random( 0, 3 ) * math.pi * 0.5
+	sm.harvestable.create( hvs_soil, params.pos, sm.quat.angleAxis( rot, sm.vec3.new( 0, 0, 1 ) ) * sm.quat.new( 0.70710678, 0, 0, 0.70710678 ) )
+	sm.effect.playEffect( "Plants - SoilbagUse", params.pos, nil, sm.quat.angleAxis( rot, sm.vec3.new( 0, 0, 1 ) ) * sm.quat.new( 0.70710678, 0, 0, 0.70710678 ) )
+	self.network:sendToClients( "cl_n_putSoil", params )
 end
 
 function SoilBag.cl_n_putSoil( self, params )

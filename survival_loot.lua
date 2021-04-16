@@ -15,6 +15,11 @@ local random_loot = {
 	{ uuid = obj_plantables_potato, 		chance = 20,	quantity = randomStackAmountAvg5 },
 
 	{ uuid = obj_consumable_sunshake, 		chance = 15 },
+	{ uuid = obj_consumable_fant_redwoc, 	chance = 15 },
+	{ uuid = obj_consumable_fant_totebots, 	chance = 15 },
+	{ uuid = obj_consumable_fant_fries, 	chance = 15 },
+	
+	
 
 	{ uuid = obj_consumable_gas,			chance = 60,	quantity = randomStackAmountAvg3 },
 	{ uuid = obj_consumable_battery,		chance = 40,	quantity = randomStackAmountAvg2 },
@@ -49,7 +54,10 @@ local random_epicloot = {
 
 	{ uuid = obj_consumable_sunshake, 		chance = 15 },
 	{ uuid = obj_consumable_longsandwich, 	chance = 15 },
-
+	{ uuid = obj_consumable_fant_redwoc, 	chance = 15 },
+	{ uuid = obj_consumable_fant_totebots, 	chance = 15 },
+	{ uuid = obj_consumable_fant_fries, 	chance = 15 },
+	
 	{ uuid = obj_consumable_gas,			chance = 60,	quantity = randomStackAmountAvg5 },
 	{ uuid = obj_consumable_battery,		chance = 40,	quantity = randomStackAmount5 },
 	{ uuid = obj_consumable_water,			chance = 10,	quantity = randomStackAmount10 },
@@ -107,6 +115,9 @@ local random_loot_startarea = {
 	{ uuid = obj_seed_redbeet,				chance = 20,	quantity = randomStackAmountAvg2 },
 	{ uuid = obj_seed_tomato,				chance = 20,	quantity = randomStackAmountAvg2 },
 	{ uuid = jnt_bearing,					chance = 10 },
+	{ uuid = obj_consumable_fant_redwoc, 	chance = 15 },
+	{ uuid = obj_consumable_fant_totebots, 	chance = 15 },
+	{ uuid = obj_consumable_fant_fries, 	chance = 15 },
 }
 
 -- Loot crates

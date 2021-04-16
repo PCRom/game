@@ -2,24 +2,30 @@
 dofile("$SURVIVAL_DATA/Scripts/game/survival_shapes.lua")
 
 TreeLog = class( nil )
+TreeLog.LogHealth = 100
+TreeLog.DamagerPerHit = math.ceil( TreeLog.LogHealth / TREE_LOG_HITS )
 
-local LogHealth = 100
-local DamagerPerHit = math.ceil( LogHealth / TREE_LOG_HITS )
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function TreeLog.server_onDestroy( self )
+	g_remove_Tree( self )
+end
 
 function TreeLog.server_onCreate( self )
+	g_add_Tree( self )
 	self:server_init()
 end
 
-function TreeLog.server_onRefresh( self )
+function TreeLog.server_onRefresh( self ) 
 	self:server_init()
 end
 
-function TreeLog.server_init( self )
-	self.health = LogHealth
+function TreeLog.server_init( self ) 
+	self.health = self.LogHealth
 end
 
 function TreeLog.server_onMelee( self, position, attacker, damage )
-	self:sv_onHit( DamagerPerHit )
+	self:sv_onHit( self.DamagerPerHit )
 end
 
 function TreeLog.sv_onHit( self, damage )
@@ -30,14 +36,18 @@ function TreeLog.sv_onHit( self, damage )
 			if self.data then
 				if self.data.treeType then
 					if self.data.treeType == "small" then
-						local shapeOffset = sm.item.getShapeOffset( obj_harvest_wood )
-						local rotation = sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), self.shape.at )
-						sm.shape.createPart( obj_harvest_wood, worldPosition - rotation * shapeOffset, rotation )
+						if SurvivalGame then
+							local shapeOffset = sm.item.getShapeOffset( obj_harvest_wood )
+							local rotation = sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), self.shape.at )
+							sm.shape.createPart( obj_harvest_wood, worldPosition - rotation * shapeOffset, rotation )
+						end
 						sm.effect.playEffect( "Tree - BreakTrunk Birch", worldPosition, nil, self.shape.worldRotation )
 					elseif self.data.treeType == "medium" then
-						local shapeOffset = sm.item.getShapeOffset( obj_harvest_wood )
-						local rotation = sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), self.shape.at )
-						sm.shape.createPart( obj_harvest_wood, worldPosition - rotation * shapeOffset, rotation )
+						if SurvivalGame then
+							local shapeOffset = sm.item.getShapeOffset( obj_harvest_wood )
+							local rotation = sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), self.shape.at )
+							sm.shape.createPart( obj_harvest_wood, worldPosition - rotation * shapeOffset, rotation )
+						end
 						sm.effect.playEffect( "Tree - BreakTrunk SpruceHalf", worldPosition, nil, self.shape.worldRotation )
 					elseif self.data.treeType == "large" then
 						
@@ -53,9 +63,11 @@ function TreeLog.sv_onHit( self, damage )
 								sm.shape.createPart( obj_harvest_log_l02b, worldPosition - ( rotation * halfTurn ) * shapeOffsetB - rotation * halfOffsetB, rotation * halfTurn )
 								sm.effect.playEffect( "Tree - BreakTrunk PineHalf", worldPosition, nil, self.shape.worldRotation )
 							elseif self.data.size == "quarter" then
-								local shapeOffset = sm.item.getShapeOffset( obj_harvest_wood2 )
-								local rotation = sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), self.shape.at )
-								sm.shape.createPart( obj_harvest_wood2, worldPosition - rotation * shapeOffset, rotation )
+								if SurvivalGame then
+									local shapeOffset = sm.item.getShapeOffset( obj_harvest_wood2 )
+									local rotation = sm.vec3.getRotation( sm.vec3.new( 0, 1, 0 ), self.shape.at )
+									sm.shape.createPart( obj_harvest_wood2, worldPosition - rotation * shapeOffset, rotation )
+								end
 								sm.effect.playEffect( "Tree - BreakTrunk PineQuarter", worldPosition, nil, self.shape.worldRotation )
 							end
 						end
@@ -68,14 +80,12 @@ function TreeLog.sv_onHit( self, damage )
 	end
 end
 
-function TreeLog.server_onExplosion( self, center, destructionLevel )
-	self:sv_onHit( destructionLevel * DamagerPerHit, center )
-end
-
-function TreeLog.server_onCollision( self, other, collisionPosition, selfPointVelocity, otherPointVelocity, collisionNormal )
+function TreeLog.server_onCollision( self, other, collisionPosition, selfPointVelocity, otherPointVelocity, collisionNormal )	
 	
 	if type( other ) == "Shape" and sm.exists( other ) then
-		if other.shapeUuid == obj_powertools_sawblade then
+		--00Fant start
+		if other.shapeUuid == obj_powertools_sawblade or other.shapeUuid == obj_powertools_fant_drill or other.shapeUuid == obj_powertools_fant_drill_small or other.shapeUuid == obj_powertools_fant_drill_large then
+		--00Fant end
 			local angularVelocity = other.body.angularVelocity
 			if angularVelocity:length() > SPINNER_ANGULAR_THRESHOLD then
 				local damage = 5

@@ -4,6 +4,9 @@ dofile("$SURVIVAL_DATA/Scripts/game/survival_shapes.lua")
 dofile("$SURVIVAL_DATA/Scripts/game/interactables/Seat.lua")
 dofile("$SURVIVAL_DATA/Scripts/util.lua")
 
+--00Fant
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_wasd_converter.lua"
+
 DriverSeat = class( Seat )
 DriverSeat.maxChildCount = 20
 DriverSeat.connectionOutput = sm.interactable.connectionType.seated + sm.interactable.connectionType.power + sm.interactable.connectionType.bearing
@@ -97,6 +100,9 @@ function DriverSeat.client_onInteractThroughJoint( self, character, state, joint
 end
 
 function DriverSeat.client_onAction( self, controllerAction, state )
+	--00Fant
+	self:SetKeyParameter( { key = controllerAction, state = state } )
+	--00Fant
 	if state == true then
 		if controllerAction == sm.interactable.actions.forward then
 			self.interactable:setSteeringFlag( sm.interactable.steering.forward )
@@ -125,6 +131,53 @@ function DriverSeat.client_onAction( self, controllerAction, state )
 	return true
 end
 
+--00Fant
+function DriverSeat.SetKeyParameter( self, data )
+	local ID = self.shape:getId()
+	if KeyParameter[ID] == nil then
+		KeyParameter[ID] = {}
+	end
+	if KeyParameter[ID].data == nil or KeyParameter[ID].data ~= data then
+		KeyParameter[ID].data = data
+		KeyParameter[ID][data.key] = data.state
+		self.network:sendToServer( "sv_SetKeyParameter", data )	
+	end
+end
+
+function DriverSeat.sv_SetKeyParameter( self, data )
+	local ID = self.shape:getId()
+	if KeyParameter[ID] == nil then
+		KeyParameter[ID] = {}
+	end
+	if KeyParameter[ID].data == nil or KeyParameter[ID].data ~= data then
+		KeyParameter[ID].data = data
+		KeyParameter[ID][data.key] = data.state
+		self.network:sendToClients( "cl_SetKeyParameter", data )	
+	end
+end
+
+function DriverSeat.cl_SetKeyParameter( self, data )
+	local ID = self.shape:getId()
+	if KeyParameter[ID] == nil then
+		KeyParameter[ID] = {}
+	end
+	if KeyParameter[ID].data == nil or KeyParameter[ID].data ~= data then
+		KeyParameter[ID].data = data
+		KeyParameter[ID][data.key] = data.state
+	end
+end
+
+function DriverSeat.server_onDestroy( self )
+	local ID = self.shape:getId()
+	KeyParameter[ID] = nil
+end
+
+function DriverSeat.client_onDestroy( self )
+	local ID = self.shape:getId()
+	KeyParameter[ID] = nil
+end
+--00Fant
+
 function DriverSeat.client_getAvailableChildConnectionCount( self, connectionType )
 
 	local level = self.Levels[tostring( self.shape:getShapeUuid() )]
@@ -149,7 +202,6 @@ function DriverSeat.client_onCreate( self )
 	self.cl.updateDelay = 0.0
 	self.cl.updateSettings = {}
 end
-
 
 function DriverSeat.client_onFixedUpdate( self, timeStep )
 	if self.cl.updateDelay > 0.0 then

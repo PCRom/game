@@ -56,7 +56,11 @@ function GlobCharacter.client_onGraphicsUnloaded( self )
 	end
 end
 
+local UnitName = "Glowbug"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_robotdetector.lua"
+
 function GlobCharacter.client_onUpdate( self, deltaTime )
+	ShowUnitInfo( self, deltaTime, UnitName )
 	if not self.graphicsLoaded then
 		return
 	end

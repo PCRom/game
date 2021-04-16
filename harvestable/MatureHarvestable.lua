@@ -4,7 +4,14 @@ dofile "$SURVIVAL_DATA/Scripts/util.lua"
 
 MatureHarvestable = class( nil )
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function MatureHarvestable.server_onDestroy( self )
+	g_remove_Finish_Soil( self )
+end
+
 function MatureHarvestable.server_onCreate( self )
+	g_add_Finish_Soil( self )
+	
 	self.harvestable.publicData = {}
 end
 

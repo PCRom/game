@@ -20,6 +20,14 @@ local PineappleRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool
 local MilkRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_milk.rend" }
 local CornRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_corn.rend" }
 
+local SteakRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fant_steak.rend" }
+local RedWocRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fant_redwoc.rend" }
+local TotebotsRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fant_totebots.rend" }
+local FriesRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fant_fries.rend" }
+local PopcornRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fant_popcorn.rend" }
+local MetRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fant_met.rend" }
+local EggplantRenderables = { "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fant_eggplant.rend" }
+
 local RenderablesEattoolTp = { "$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_tp_eattool.rend", "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_tp.rend" }
 local RenderablesEattoolFp = { "$SURVIVAL_DATA/Character/Char_Male/Animations/char_male_fp_eattool.rend", "$SURVIVAL_DATA/Character/Char_Tools/Char_eattool/char_eattool_fp.rend" }
 
@@ -36,6 +44,15 @@ sm.tool.preloadRenderables( PizzaBurgerRenderables )
 sm.tool.preloadRenderables( PineappleRenderables )
 sm.tool.preloadRenderables( CornRenderables )
 sm.tool.preloadRenderables( RedbeetRenderables )
+
+sm.tool.preloadRenderables( SteakRenderables )
+sm.tool.preloadRenderables( RedWocRenderables )
+sm.tool.preloadRenderables( TotebotsRenderables )
+sm.tool.preloadRenderables( FriesRenderables )
+sm.tool.preloadRenderables( PopcornRenderables )
+sm.tool.preloadRenderables( MetRenderables )
+sm.tool.preloadRenderables( EggplantRenderables )
+
 sm.tool.preloadRenderables( RenderablesEattoolTp )
 sm.tool.preloadRenderables( RenderablesEattoolFp )
 
@@ -53,10 +70,17 @@ local FoodUuidToRenderable =
 	[tostring( obj_plantables_redbeet )] = RedbeetRenderables,
 	[tostring( obj_plantables_tomato )] = TomatoRenderables,
 	[tostring( obj_plantables_broccoli )] = BroccoliRenderables,
-	[tostring( obj_resource_corn )] = CornRenderables
+	[tostring( obj_resource_corn )] = CornRenderables,
+	[tostring( obj_consumable_fant_steak )] = SteakRenderables,
+	[tostring( obj_consumable_fant_redwoc )] = RedWocRenderables,
+	[tostring( obj_consumable_fant_totebots )] = TotebotsRenderables,
+	[tostring( obj_consumable_fant_fries )] = FriesRenderables,
+	[tostring( obj_consumable_fant_popcorn )] = PopcornRenderables,
+	[tostring( obj_consumable_fant_met )] = MetRenderables,
+	[tostring( obj_plantables_eggplant )] = EggplantRenderables
 }
 
-local Drinks = { obj_consumable_sunshake, obj_consumable_milk }
+local Drinks = { obj_consumable_sunshake, obj_consumable_milk, obj_consumable_fant_redwoc, obj_consumable_fant_met }
 
 function Eat.client_onCreate( self )
 	self.tpAnimations = createTpAnimations( self.tool, {} )

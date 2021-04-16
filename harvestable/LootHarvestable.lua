@@ -3,6 +3,10 @@ dofile "$SURVIVAL_DATA/Scripts/util.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_constants.lua"
 
 LootHarvestable = class( nil )
+--00Fant start
+-- Apollyon: global var for harvestables 
+g_lootHarvestables = g_lootHarvestables or {}
+--00Fant end
 
 function LootHarvestable.server_onCreate( self )
 	self.sv = {}
@@ -25,6 +29,11 @@ function LootHarvestable.server_onCreate( self )
 	
 	self.network:setClientData( { uuid = self.sv.saved.uuid, quantity = self.sv.saved.quantity, epic = self.sv.saved.epic } )
 	self.harvestable.publicData = { uuid = self.sv.saved.uuid, quantity = self.sv.saved.quantity }
+
+	--00Fant start
+	-- Apollyon: Add spawned harvestable to global var note: if anyone comes up with a better method to obtain harvestables from somewhere let me know.
+	g_lootHarvestables[self.harvestable.id] = { uuid = self.sv.saved.uuid, quantity = self.sv.saved.quantity, epic = self.sv.saved.epic }
+	--00Fant end
 end
 
 function LootHarvestable.server_onUnload( self )

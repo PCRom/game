@@ -57,7 +57,13 @@ function WocCharacter.client_onGraphicsUnloaded( self )
 	end
 end
 
+local UnitName = "Woc"
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_robotdetector.lua"
+
+
 function WocCharacter.client_onUpdate( self, deltaTime )
+	ShowUnitInfo( self, deltaTime, UnitName )
+	
 	if not self.graphicsLoaded then
 		return
 	end
@@ -89,6 +95,7 @@ function WocCharacter.client_onUpdate( self, deltaTime )
 		self.character:updateAnimation( animation.info.name, animation.time, animation.weight )
 	end
 end
+
 
 function WocCharacter.client_onEvent( self, event )
 	if not self.animationsLoaded then

@@ -7,7 +7,14 @@ StoneHarvestable = class( nil )
 StoneHarvestable.ChunkHealth = 100
 StoneHarvestable.DamagerPerHit = 25
 
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function StoneHarvestable.server_onDestroy( self )
+	g_remove_Rock( self )
+end
+
 function StoneHarvestable.server_onCreate( self )
+	g_add_Rock( self )
 	self:sv_init()
 end
 
@@ -140,7 +147,9 @@ end
 
 function StoneHarvestable.server_onCollision( self, other, collisionPosition, selfPointVelocity, otherPointVelocity, collisionNormal )
 	if type( other ) == "Shape" and sm.exists( other ) then
-		if other.shapeUuid == obj_powertools_drill then
+		--00Fant start
+		if other.shapeUuid == obj_powertools_drill or other.shapeUuid == obj_powertools_fant_drill or other.shapeUuid == obj_powertools_fant_drill_small or other.shapeUuid == obj_powertools_fant_drill_large then
+		--00Fant end
 			local angularVelocity = other.body.angularVelocity
 			if angularVelocity:length() > SPINNER_ANGULAR_THRESHOLD then
 				local damage = math.min( 2.5, angularVelocity:length() )

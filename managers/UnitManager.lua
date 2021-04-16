@@ -11,11 +11,11 @@ local PlayerDensityTickInterval = 4800 -- Save player position once every other 
 
 local CropAttackCellScanCooldownTime = 0.5 * 40
 local CellScanCooldown = 15 * 40
-local MinimumCropValueForRaid = 10
+local MinimumCropValueForRaid = 300
 local HighValueCrop = 3
 
-local RaidWaveCooldown = DaysInTicks( 4.5 / 24 )
-local RaidFinishedCooldown = DaysInTicks( 4.5 / 24 )
+local RaidWaveCooldown = DaysInTicks( 240 / 24 )
+local RaidFinishedCooldown = DaysInTicks( 240 / 24 )
 
 local NoiseShapeSettings = {
 	[tostring( obj_interactive_radio )] = { noiseRadius = 40 },
@@ -49,6 +49,7 @@ local NoiseShapeSettings = {
 local Crops = {
 	[tostring(hvs_growing_banana)] = 2, [tostring(hvs_mature_banana)] = 2,
 	[tostring(hvs_growing_blueberry)] = 2, [tostring(hvs_mature_blueberry)] = 2,
+	[tostring(hvs_growing_eggplant)] = 2, [tostring(hvs_mature_eggplant)] = 2,
 	[tostring(hvs_growing_orange)] = 2, [tostring(hvs_mature_orange)] = 2,
 	[tostring(hvs_growing_pineapple)] = 3, [tostring(hvs_mature_pineapple)] = 3,
 	[tostring(hvs_growing_carrot)] = 1, [tostring(hvs_mature_carrot)] = 1,

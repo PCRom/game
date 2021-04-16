@@ -7,8 +7,13 @@ GrowingHarvestable.SoilFrames = 10
 GrowingHarvestable.WaterRetentionTickTime = 40 * DAYCYCLE_TIME * 1.5
 GrowingHarvestable.TimeStep = 0.025
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function GrowingHarvestable.server_onDestroy( self )
+	g_remove_Growing_Soil( self )
+end
 -- Server
 function GrowingHarvestable.server_onCreate( self )
+	g_add_Growing_Soil( self )
 	
 	self.sv = self.storage:load()
 	if self.sv == nil then
@@ -112,13 +117,19 @@ end
 
 function GrowingHarvestable.sv_e_fertilize( self, params )
 	if not self.sv.fertilizer then
-		if sm.container.beginTransaction() then
-			sm.container.spendFromSlot( params.playerInventory, params.slot, obj_consumable_fertilizer, 1, true )
-			if sm.container.endTransaction() then
-				self:sv_performUpdate() -- Catch up to current time
-				self.sv.fertilizer = true
-				self:sv_performUpdate() -- Save and synch fertilizer
+		if sm.game.getLimitedInventory() then
+			if sm.container.beginTransaction() then
+				sm.container.spendFromSlot( params.playerInventory, params.slot, obj_consumable_fertilizer, 1, true )
+				if sm.container.endTransaction() then
+					self:sv_performUpdate() -- Catch up to current time
+					self.sv.fertilizer = true
+					self:sv_performUpdate() -- Save and synch fertilizer
+				end
 			end
+		else
+			self:sv_performUpdate() -- Catch up to current time
+			self.sv.fertilizer = true
+			self:sv_performUpdate() -- Save and synch fertilizer
 		end
 	end
 end
@@ -197,5 +208,11 @@ function GrowingHarvestable.client_onClientDataUpdate( self, clientData )
 	self.cl.growTicks = clientData.growTicks
 	
 	self.cl.fakeTickElapsedTime = 0
-	self.harvestable.clientPublicData.fertilizer = self.cl.fertilizer
+	self.harvestable.clientPublicData = { fertilizer = self.cl.fertilizer, waterstate = self.cl.waterTicks, growFraction = self.cl.growTicks / self.cl.growTickTime }
+	self.network:sendToServer( "sv_setData", self.harvestable.clientPublicData )
+end
+
+
+function GrowingHarvestable.sv_setData( self, data ) 
+	self.harvestable.publicData = data
 end

@@ -9,6 +9,12 @@ dofile "$SURVIVAL_DATA/Scripts/game/units/states/BreachState.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/units/states/CombatAttackState.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_constants.lua"
 
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_tesla_coil.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/weapons/Fant_ElectroHammer/Fant_ElectroHammer.lua"
+dofile( "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua" )
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_flamethrower.lua"
+
 TotebotGreenUnit = class( nil )
 
 local RoamStartTimeMin = 40 * 4 -- 4 seconds
@@ -126,8 +132,8 @@ function TotebotGreenUnit.server_onCreate( self )
 	self.attackState01 = self.unit:createState( "meleeAttack" )
 	self.attackState01.meleeType = "ToteBotAttack"
 	self.attackState01.event = "melee"
-	self.attackState01.damage = 15
-	self.attackState01.attackRange = 1.15
+	self.attackState01.damage = 20
+	self.attackState01.attackRange = 2.0
 	self.attackState01.animationCooldown = 0.825 * 40
 	self.attackState01.attackCooldown = 1.0 * 40
 	self.attackState01.globalCooldown = 0.0 * 40
@@ -209,6 +215,10 @@ function TotebotGreenUnit.server_onDestroy( self )
 end
 
 function TotebotGreenUnit.server_onFixedUpdate( self, dt )
+	ProcessTeslaDamage( self, false )
+	FlamethrowerDamage( self, dt )
+	
+	
 	
 	-- Temporary units are destroyed at dawn
 	if sm.exists( self.unit ) and not self.destroyed then
@@ -330,7 +340,7 @@ function TotebotGreenUnit.server_onUnitUpdate( self, dt )
 	local closestVisibleWormCharacter
 	local closestVisibleCrop
 	local closestVisibleTeamOpponent
-	if not SurvivalGame then
+	if not isSurvival then
 		closestVisibleTeamOpponent = sm.ai.getClosestVisibleTeamOpponent( self.unit, self.unit.character:getColor() )
 	end
 	closestVisiblePlayerCharacter = sm.ai.getClosestVisiblePlayerCharacter( self.unit )
@@ -371,7 +381,7 @@ function TotebotGreenUnit.server_onUnitUpdate( self, dt )
 			if sm.exists( allyUnit ) and self.unit ~= allyUnit and allyUnit.character and isAnyOf( allyUnit.character:getCharacterType(), g_robots ) and InSameWorld( self.unit, allyUnit) then
 				if ( allyUnit.character.worldPosition - self.unit.character.worldPosition ):length() <= AllyRange then
 					local sameTeam = true
-					if not SurvivalGame then
+					if not isSurvival then
 						sameTeam = InSameTeam( allyUnit, self.unit )
 					end
 					if sameTeam then
@@ -681,9 +691,13 @@ function TotebotGreenUnit.server_onProjectile( self, hitPos, hitTime, hitVelocit
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	
+	if projectileName == "water" then
+		ExtinguishFire( self )
+	end
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -708,9 +722,10 @@ function TotebotGreenUnit.server_onMelee( self, hitPos, attacker, damage )
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	GetMeleeHit( self, attacker )
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -746,7 +761,7 @@ function TotebotGreenUnit.server_onCollision( self, other, collisionPosition, se
 			return
 		end
 		local teamOpponent = false
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( other, self.unit )
 		end
 		if other:isPlayer() or teamOpponent then
@@ -785,11 +800,11 @@ function TotebotGreenUnit.server_onCollision( self, other, collisionPosition, se
 		self:sv_takeDamage( damage, collisionNormal, collisionPosition )
 	end
 	if tumbleTicks > 0 then
-		if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
-			if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
-				sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
-			end
-		end
+		-- if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
+			-- if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
+				-- sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
+			-- end
+		-- end
 	end
 	
 end
@@ -855,7 +870,7 @@ function TotebotGreenUnit.sv_onDeath( self, impact )
 		self.unit:destroy()
 		print("'TotebotGreenUnit' killed!")
 		self:sv_spawnParts( impact )
-		if SurvivalGame then
+		if isSurvival then
 			local loot = SelectLoot( "loot_totebot_green" )
 			SpawnLoot( self.unit, loot )
 		end
@@ -878,12 +893,10 @@ function TotebotGreenUnit.sv_spawnParts( self, impact )
 	bodyPos = bodyPos - bodyOffset
 
 	local color = self.unit.character:getColor()
-	if SurvivalGame then
+	if isSurvival then
 		if math.random( 1, 5 ) == 1 then
-			local headBody = sm.body.createBody( bodyPos, bodyRot, true )
-			local headShape = headBody:createPart( obj_interactive_robotbliphead01, sm.vec3.new( 0, 1, 2 ), sm.vec3.new( 0, 1, 0 ), sm.vec3.new( -1, 0, 0 ), true )
-			headShape.color = color
-			sm.physics.applyImpulse( headShape, impact * headShape.mass, true )
+			local params = { lootUid = obj_interactive_robotbliphead01, lootQuantity = 1, epic = false }
+			sm.projectile.customProjectileAttack( params, "loot", 0, bodyPos, sm.vec3.new( 0, 0, 0 ), self.unit, bodyPos, bodyPos, 0 )
 		end
 	end
 
@@ -902,7 +915,7 @@ function TotebotGreenUnit.sv_e_receiveTarget( self, params )
 	if self.unit ~= params.unit then
 		if self.eventTarget == nil then
 			local sameTeam = false
-			if not SurvivalGame then
+			if not isSurvival then
 				sameTeam = InSameTeam( params.targetCharacter, self.unit )
 			end
 			if not sameTeam then
@@ -912,6 +925,8 @@ function TotebotGreenUnit.sv_e_receiveTarget( self, params )
 	end
 end
 
-function TotebotGreenUnit.sv_e_onEnterWater( self ) end
+function TotebotGreenUnit.sv_e_onEnterWater( self )
+	ExtinguishFire( self )
+end
 
 function TotebotGreenUnit.sv_e_onStayWater( self ) end

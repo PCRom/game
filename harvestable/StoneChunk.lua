@@ -5,7 +5,14 @@ dofile("$SURVIVAL_DATA/Scripts/game/survival_constants.lua")
 StoneChunk = class( nil )
 StoneChunk.DamagerPerHit = 25
 
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+function StoneChunk.server_onDestroy( self )
+	g_remove_Rock( self )
+end
+
 function StoneChunk.server_onCreate( self )
+	g_add_Rock( self )
 	self:sv_init()
 	
 	if self.params then
@@ -51,10 +58,12 @@ function StoneChunk.sv_onHit( self, damage )
 			if self.data then
 				if self.data.chunkSize then
 					if self.data.chunkSize == 1 then
-						local harvest = math.random( 3 ) == 1 and obj_harvest_metal2 or obj_harvest_stone
-						local shapeOffset = sm.item.getShapeOffset( harvest )
-						local rotation = self.shape.worldRotation
-						sm.shape.createPart( harvest, worldPosition - rotation * shapeOffset, rotation )
+						if SurvivalGame then
+							local harvest = math.random( 3 ) == 1 and obj_harvest_metal2 or obj_harvest_stone
+							local shapeOffset = sm.item.getShapeOffset( harvest )
+							local rotation = self.shape.worldRotation
+							sm.shape.createPart( harvest, worldPosition - rotation * shapeOffset, rotation )
+						end
 						sm.effect.playEffect( "Stone - BreakChunk small", worldPosition, nil, self.shape.worldRotation, nil, { size = self.shape:getMass() / AUDIO_MASS_DIVIDE_RATIO } )
 					elseif self.data.chunkSize == 2 then
 						local shapeOffset = sm.item.getShapeOffset( obj_harvest_stonechunk01 )
@@ -82,12 +91,20 @@ function StoneChunk.sv_onHit( self, damage )
 end
 
 function StoneChunk.server_onExplosion( self, center, destructionLevel )
-	self:sv_onHit( 100.0 )
+	if self.data then
+		if self.data.chunkSize then
+			if self.data.chunkSize > 1 then
+				self:sv_onHit( 100.0 )
+			end
+		end
+	end
 end
 
 function StoneChunk.server_onCollision( self, other, collisionPosition, selfPointVelocity, otherPointVelocity, collisionNormal )
 	if type( other ) == "Shape" and sm.exists( other ) then
-		if other.shapeUuid == obj_powertools_drill then
+		--00Fant start
+		if other.shapeUuid == obj_powertools_drill or other.shapeUuid == obj_powertools_fant_drill or other.shapeUuid == obj_powertools_fant_drill_small or other.shapeUuid == obj_powertools_fant_drill_large then
+		--00Fant end
 			local angularVelocity = other.body.angularVelocity
 			if angularVelocity:length() > SPINNER_ANGULAR_THRESHOLD then
 				local damage = 2.5

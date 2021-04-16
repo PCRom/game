@@ -2,6 +2,22 @@ dofile "$GAME_DATA/Scripts/game/AnimationUtil.lua"
 dofile "$SURVIVAL_DATA/Scripts/util.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_shapes.lua"
 
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+
+function GetDamageData( self )
+	local ID = self.tool:getOwner():getId()
+	if ID then
+		if g_Players[ ID ] then
+			if g_Players[ ID ].damagebuff then
+				if g_Players[ ID ].damagebuff >= 1 then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
 local Damage = 16
 
 PotatoShotgun = class()
@@ -591,9 +607,13 @@ function PotatoShotgun.cl_onPrimaryUse( self, state )
 
 			local owner = self.tool:getOwner()
 			if owner then
-				sm.projectile.projectileAttack( "fries", Damage, firePos, dir * fireMode.fireVelocity, owner, fakePosition, fakePositionSelf )
+				local rel_Damage = Damage
+				if GetDamageData( self ) then
+					rel_Damage = rel_Damage * 2
+				end
+				sm.projectile.projectileAttack( "fries", rel_Damage, firePos, dir * fireMode.fireVelocity, owner, fakePosition, fakePositionSelf )
 			end
-
+			
 			-- Timers
 			self.fireCooldownTimer = fireMode.fireCooldown
 			self.spreadCooldownTimer = math.min( self.spreadCooldownTimer + fireMode.spreadIncrement, fireMode.spreadCooldown )

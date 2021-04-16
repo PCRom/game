@@ -6,6 +6,13 @@ dofile "$SURVIVAL_DATA/Scripts/game/units/states/PathingState.lua"
 dofile "$SURVIVAL_DATA/Scripts/util.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_constants.lua"
 
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_tesla_coil.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
+dofile "$SURVIVAL_DATA/Objects/00fant/weapons/Fant_ElectroHammer/Fant_ElectroHammer.lua"
+dofile( "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua" )
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_flamethrower.lua"
+
 TapebotUnit = class( nil )
 
 local AllyRange = 20.0
@@ -125,9 +132,9 @@ function TapebotUnit.server_onCreate( self )
 		self.rangedAttack.aimTime = 0.1
 	end
 	self.rangedAttack.event = "shoot"
-	self.rangedAttack.damage = 55
+	self.rangedAttack.damage = 20
 	self.rangedAttack.fakeOffset = sm.vec3.new( 0.5, 0.5, -0.25 )
-	self.rangedAttack.velocity = 40
+	self.rangedAttack.velocity = 20
 	
 	self.attackRange = 40.0
 	self.fireLaneWidth = 0.3
@@ -177,6 +184,9 @@ function TapebotUnit.server_onDestroy( self )
 end
 
 function TapebotUnit.server_onFixedUpdate( self, dt )
+	ProcessTeslaDamage( self, false )
+	FlamethrowerDamage( self, dt )
+	
 	
 	if sm.exists( self.unit ) and not self.destroyed then
 		if self.saved.deathTickTimestamp and sm.game.getCurrentTick() >= self.saved.deathTickTimestamp then
@@ -306,7 +316,7 @@ function TapebotUnit.server_onUnitUpdate( self, dt )
 	local closestVisibleWormCharacter
 	local closestVisibleCrop
 	local closestVisibleTeamOpponent
-	if not SurvivalGame then
+	if not isSurvival then
 		closestVisibleTeamOpponent = sm.ai.getClosestVisibleTeamOpponent( self.unit, self.unit.character:getColor() )
 	end
 	closestVisiblePlayerCharacter = sm.ai.getClosestVisiblePlayerCharacter( self.unit )
@@ -343,7 +353,7 @@ function TapebotUnit.server_onUnitUpdate( self, dt )
 			if sm.exists( allyUnit ) and self.unit ~= allyUnit and allyUnit.character and isAnyOf( allyUnit.character:getCharacterType(), g_robots ) and InSameWorld( self.unit, allyUnit) then
 				if ( allyUnit.character.worldPosition - self.unit.character.worldPosition ):length() <= AllyRange then
 					local sameTeam = true
-					if not SurvivalGame then
+					if not isSurvival then
 						sameTeam = InSameTeam( allyUnit, self.unit )
 					end
 					if sameTeam then
@@ -596,9 +606,13 @@ function TapebotUnit.server_onProjectile( self, hitPos, hitTime, hitVelocity, pr
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	
+	if projectileName == "water" then
+		ExtinguishFire( self )
+	end
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -631,9 +645,10 @@ function TapebotUnit.server_onMelee( self, hitPos, attacker, damage, power )
 	if not sm.exists( self.unit ) or not sm.exists( attacker ) then
 		return
 	end
+	GetMeleeHit( self, attacker )
 	local teamOpponent = false
 	if type( attacker ) == "Unit" then
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( attacker, self.unit )
 		end
 	end
@@ -675,7 +690,7 @@ function TapebotUnit.server_onCollision( self, other, collisionPosition, selfPoi
 			return
 		end
 		local teamOpponent = false
-		if not SurvivalGame then
+		if not isSurvival then
 			teamOpponent = not InSameTeam( other, self.unit )
 		end
 		if other:isPlayer() or teamOpponent then
@@ -714,11 +729,11 @@ function TapebotUnit.server_onCollision( self, other, collisionPosition, selfPoi
 		self:sv_takeDamage( damage, collisionNormal, false )
 	end
 	if tumbleTicks > 0 then
-		if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
-			if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
-				sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
-			end
-		end
+		-- if startTumble( self, tumbleTicks, self.idleState, tumbleVelocity ) then
+			-- if type( other ) == "Shape" and sm.exists( other ) and other.body:isDynamic() then
+				-- sm.physics.applyImpulse( other.body, impactReaction * other.body.mass, true, collisionPosition - other.body.worldPosition )
+			-- end
+		-- end
 	end
 	
 end
@@ -757,7 +772,7 @@ function TapebotUnit.sv_onDeath( self, impact, headDestroyed )
 		print("'TapebotUnit' killed!")
 		sm.effect.playEffect( "TapeBot - Destroyed", character.worldPosition, nil, nil, nil, { Color = self.unit.character:getColor() } )
 		self:sv_spawnParts( impact, headDestroyed )
-		if SurvivalGame then
+		if isSurvival then
 			local loot = SelectLoot( "loot_tapebot" )
 			SpawnLoot( self.unit, loot )
 		end
@@ -825,7 +840,7 @@ function TapebotUnit.sv_e_receiveTarget( self, params )
 	if self.unit ~= params.unit then
 		if self.eventTarget == nil then
 			local sameTeam = false
-			if not SurvivalGame then
+			if not isSurvival then
 				sameTeam = InSameTeam( params.targetCharacter, self.unit )
 			end
 			if not sameTeam then
@@ -835,6 +850,8 @@ function TapebotUnit.sv_e_receiveTarget( self, params )
 	end
 end
 
-function TapebotUnit.sv_e_onEnterWater( self ) end
+function TapebotUnit.sv_e_onEnterWater( self )
+	ExtinguishFire( self )
+end
 
 function TapebotUnit.sv_e_onStayWater( self ) end

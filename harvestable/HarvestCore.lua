@@ -1,13 +1,20 @@
 -- HarvestCore.lua --
 dofile("$SURVIVAL_DATA/Scripts/game/survival_units.lua")
+dofile "$SURVIVAL_DATA/Scripts/game/survivalPlayer.lua"
 
 HarvestCore = class( nil )
 HarvestCore.resetStateOnInteract = false
 
 local RefineStaminaCost = 10
 local RefineTime = 5.2
+local RefineBoost = 10
+
+
+dofile "$SURVIVAL_DATA/Objects/00fant/scripts/fant_unitfacer.lua"
+
 
 function HarvestCore.server_onCreate( self )
+	g_add_Rod( self )
 	self:sv_init()
 end
 
@@ -20,6 +27,7 @@ function HarvestCore.sv_init( self )
 end
 
 function HarvestCore.server_onDestroy( self )
+	g_remove_Rod( self )
 	local activeUsers = {}
 	for _, user in ipairs( self.users ) do
 		activeUsers[#activeUsers+1] = user
@@ -28,6 +36,7 @@ function HarvestCore.server_onDestroy( self )
 		local params = { user = user, state = false }
 		self:sv_n_setRefiningState( params )
 	end
+	self.refinePlayer = nil
 end
 
 function HarvestCore.client_onDestroy( self )
@@ -38,6 +47,7 @@ end
 
 function HarvestCore.client_onCreate( self )
 	self:cl_init()
+	self.refinePlayer = sm.localPlayer.getPlayer()
 end
 
 function HarvestCore.client_onRefresh( self )
@@ -94,7 +104,7 @@ end
 function HarvestCore.client_onUpdate( self, dt )
 	if self.client_refining == true then
 		sm.gui.setProgressFraction( self.client_refineElapsed / RefineTime )
-		self.client_refineElapsed = self.client_refineElapsed + dt
+		self.client_refineElapsed = self.client_refineElapsed + ( dt * self:RefineBoost() )
 		if self.client_refineElapsed >= RefineTime then
 			self.client_refining = false
 			self.client_refineElapsed = 0.0
@@ -122,4 +132,30 @@ function HarvestCore.sv_refine( self, player )
 		end
 	end
 	
+end
+
+function HarvestCore.sv_setRefinePlayer( self, refinePlayer )
+	self.refinePlayer = refinePlayer
+	--self.network:sendToClients( "cl_setRefinePlayer", self.refinePlayer )
+end
+
+function HarvestCore.cl_setRefinePlayer( self, refinePlayer )
+	self.refinePlayer = refinePlayer
+end
+
+function HarvestCore.RefineBoost( self )
+	if self.refinePlayer == nil then
+		return 1
+	end
+	local ID = self.refinePlayer:getId()
+	if ID then
+		if g_Players[ ID ] then
+			if g_Players[ ID ].refinebuff then
+				if g_Players[ ID ].refinebuff >= 1 then
+					return RefineBoost
+				end
+			end
+		end
+	end
+	return 1
 end
