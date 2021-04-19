@@ -83,7 +83,7 @@ local EngineLevels = {
 function ElectricEngine.server_onCreate( self )
 	local container = self.shape.interactable:getContainer( 0 )
 	if not container then
-		container = self.shape:getInteractable():addContainer( 0, 1, 10 )
+		container = self.shape:getInteractable():addContainer( 0, 1, 20 )
 	end
 	container:setFilters( { obj_consumable_battery } )
 

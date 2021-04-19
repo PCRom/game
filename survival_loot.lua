@@ -15,11 +15,6 @@ local random_loot = {
 	{ uuid = obj_plantables_potato, 		chance = 20,	quantity = randomStackAmountAvg5 },
 
 	{ uuid = obj_consumable_sunshake, 		chance = 15 },
-	{ uuid = obj_consumable_fant_redwoc, 	chance = 15 },
-	{ uuid = obj_consumable_fant_totebots, 	chance = 15 },
-	{ uuid = obj_consumable_fant_fries, 	chance = 15 },
-	
-	
 
 	{ uuid = obj_consumable_gas,			chance = 60,	quantity = randomStackAmountAvg3 },
 	{ uuid = obj_consumable_battery,		chance = 40,	quantity = randomStackAmountAvg2 },
@@ -39,8 +34,17 @@ local random_loot = {
 	{ uuid = obj_seed_potato,				chance = 20,	quantity = randomStackAmountAvg2 },
 
 	{ uuid = blk_glass,						chance = 20,	quantity = randomStackAmount10 },
+	{ uuid = blk_metal3,						chance = 20,	quantity = randomStackAmount10 },
+	{ uuid = blk_metal2,						chance = 20,	quantity = randomStackAmount10 },
 
 	{ uuid = jnt_bearing, 					chance = 5,		quantity = 1 },
+	--Fant Items
+	{ uuid = obj_consumable_fant_redwoc, 	chance = 15 },
+	{ uuid = obj_consumable_fant_totebots, 	chance = 15 },
+	{ uuid = obj_consumable_fant_fries, 	chance = 15 },
+	{ uuid = obj_interactive_fant_plastic, 	chance = 20, quantity = randomStackAmountAvg10 },
+	{ uuid = obj_interactive_fant_wire, 	chance = 20, quantity = randomStackAmountAvg10 },
+	
 }
 
 local random_epicloot = {
@@ -54,10 +58,10 @@ local random_epicloot = {
 
 	{ uuid = obj_consumable_sunshake, 		chance = 15 },
 	{ uuid = obj_consumable_longsandwich, 	chance = 15 },
-	{ uuid = obj_consumable_fant_redwoc, 	chance = 15 },
+	{ uuid = obj_consumable_fant_redwoc, 	chance = 20 },
 	{ uuid = obj_consumable_fant_totebots, 	chance = 15 },
 	{ uuid = obj_consumable_fant_fries, 	chance = 15 },
-	
+
 	{ uuid = obj_consumable_gas,			chance = 60,	quantity = randomStackAmountAvg5 },
 	{ uuid = obj_consumable_battery,		chance = 40,	quantity = randomStackAmount5 },
 	{ uuid = obj_consumable_water,			chance = 10,	quantity = randomStackAmount10 },
@@ -101,6 +105,8 @@ local random_warehouseloot = {
 	{ uuid = obj_consumable_fertilizer,		chance = 25,	quantity = randomStackAmountAvg10 },
 	{ uuid = obj_consumable_soilbag,		chance = 40,	quantity = randomStackAmountAvg3 },
 	{ uuid = obj_consumable_component,		chance = 70,	quantity = 1 },
+	{ uuid = obj_interactive_fant_plastic, 	chance = 30, quantity = randomStackAmountAvg10 },
+	{ uuid = obj_interactive_fant_wire, 	chance = 30, quantity = randomStackAmountAvg10 },
 }
 
 local random_loot_startarea = {
@@ -118,6 +124,9 @@ local random_loot_startarea = {
 	{ uuid = obj_consumable_fant_redwoc, 	chance = 15 },
 	{ uuid = obj_consumable_fant_totebots, 	chance = 15 },
 	{ uuid = obj_consumable_fant_fries, 	chance = 15 },
+	{ uuid = obj_interactive_fant_plastic, 	chance = 15, quantity = randomStackAmountAvg10 },
+	{ uuid = obj_interactive_fant_wire, 	chance = 15, quantity = randomStackAmountAvg10 },
+	
 }
 
 -- Loot crates
@@ -147,6 +156,16 @@ local loot_crate_epic = {
 		{ uuid = obj_interactive_seat_01, 			chance = 20 },
 		{ uuid = obj_interactive_driversaddle_01, 	chance = 10 },
 		{ uuid = obj_interactive_saddle_01, 		chance = 20 },
+		--Fant Items
+		{ uuid = obj_interactive_fant_clock_body, 	chance = 5 },
+		{ uuid = obj_interactive_logoframe, 	chance = 5 },
+		{ uuid = obj_interactive_fant_angle_sensor, 	chance = 5 },
+		{ uuid = obj_interactive_fant_smoker, 	chance = 5 },
+		{ uuid = obj_interactive_fant_campfire, 	chance = 5 },
+		{ uuid = obj_interactive_fant_gyroscope, 	chance = 5 },
+		{ uuid = obj_interactive_fant_gyroscope3x3, 	chance = 5 },
+		{ uuid = obj_interactive_fant_daylight_sensor, 	chance = 5 },
+		{ uuid = obj_interactive_fant_itemdetector, 	chance = 5 },
 	},
 	randomLoot = random_epicloot
 }
@@ -154,16 +173,51 @@ local loot_crate_epic = {
 local loot_crate_epic_warehouse = {
 	slots = function() return 3 end,
 	selectOne = {
-		{ uuid = jnt_suspensionoffroad_03, 			chance = 1 },
-		{ uuid = jnt_suspensionsport_03, 			chance = 1 },
-		{ uuid = jnt_interactive_piston_03, 		chance = 1 },
-		{ uuid = obj_interactive_gasengine_03, 		chance = 1 },
-		{ uuid = obj_interactive_electricengine_03, chance = 1 },
-		{ uuid = obj_interactive_controller_03, 	chance = 1 },
-		{ uuid = obj_interactive_driverseat_03, 	chance = 1 },
-		{ uuid = obj_interactive_seat_03, 			chance = 1 },
-		{ uuid = obj_interactive_driversaddle_03, 	chance = 1 },
-		{ uuid = obj_interactive_saddle_03, 		chance = 1 },
+		{ uuid = jnt_suspensionoffroad_03, 			chance = 5 },
+		{ uuid = jnt_suspensionoffroad_04, 			chance = 3 },
+		{ uuid = jnt_suspensionoffroad_05, 			chance = 2 },
+		{ uuid = jnt_suspensionsport_03, 			chance = 5 },
+		{ uuid = jnt_suspensionsport_04, 			chance = 3 },
+		{ uuid = jnt_suspensionsport_05, 			chance = 2 },
+		{ uuid = jnt_interactive_piston_03, 		chance = 2 },
+		{ uuid = jnt_interactive_piston_04, 		chance = 3 },
+		{ uuid = jnt_interactive_piston_05, 		chance = 2 },
+		{ uuid = obj_interactive_gasengine_03, 		chance = 5 },
+		{ uuid = obj_interactive_gasengine_04, 		chance = 3 },
+		{ uuid = obj_interactive_gasengine_05, 		chance = 2 },
+		{ uuid = obj_interactive_electricengine_03, chance = 5 },
+		{ uuid = obj_interactive_electricengine_04, chance = 3 },
+		{ uuid = obj_interactive_electricengine_05, chance = 2 },
+		{ uuid = obj_interactive_controller_03, 	chance = 5 },
+		{ uuid = obj_interactive_controller_04, 	chance = 3 },
+		{ uuid = obj_interactive_controller_05, 	chance = 2 },
+		{ uuid = obj_interactive_driverseat_03, 	chance = 5 },
+		{ uuid = obj_interactive_driverseat_04, 	chance = 3 },
+		{ uuid = obj_interactive_driverseat_05, 	chance = 2 },
+		{ uuid = obj_interactive_seat_03, 			chance = 5 },
+		{ uuid = obj_interactive_seat_04, 			chance = 3 },
+		{ uuid = obj_interactive_seat_05, 			chance = 2 },
+		{ uuid = obj_interactive_driversaddle_03, 	chance = 5 },
+		{ uuid = obj_interactive_driversaddle_04, 	chance = 3 },
+		{ uuid = obj_interactive_driversaddle_05, 	chance = 2 },
+		{ uuid = obj_interactive_saddle_03, 		chance = 5 },
+		{ uuid = obj_interactive_saddle_04, 		chance = 3 },
+		{ uuid = obj_interactive_saddle_05, 		chance = 2 },
+		--Fant Items
+		{ uuid = obj_interactive_mcp, 				chance = 2 },
+		{ uuid = obj_interactive_fant_anchor, 		chance = 2 },
+		{ uuid = obj_interactive_fant_anchor, 		chance = 2 },
+		{ obj_interactive_fant_robotScanner, 		chance = 2 },
+		{ obj_interactive_chemical_lift_engine, 		chance = 2 },
+		{ obj_interactive_fant_campfire, 		chance = 2 },
+		{ obj_interactive_fant_miner, 		chance = 2 },
+		{ obj_interactive_fant_tesla_coil, 		chance = 2 },
+		{ obj_interactive_fant_autocrafter, 		chance = 2 },
+		{ obj_interactive_fant_steamengine, 		chance = 2 },
+		{ obj_interactive_fant_large_container, 		chance = 2 },
+		{ obj_interactive_fant_seedpress, 		chance = 2 },
+		{ obj_interactive_fant_wireless, 		chance = 2 },
+		{ obj_interactive_fant_chest, 		chance = 2 },
 	},
 	randomLoot = random_warehouseloot
 }
@@ -262,7 +316,7 @@ local loot_farmbot = {
 		{ uuid = obj_survivalobject_keycard,	chance = 1 },
 	},
 	randomLoot = {
-		{ uuid = obj_consumable_component,		chance = 2,		quantity = randomStackAmountAvg2 },
+		{ uuid = obj_consumable_component,		chance = 2,		quantity = randomStackAmountAvg5 },
 		{ uuid = obj_resource_circuitboard,		chance = 1,		quantity = randomStackAmountAvg2 },
 	}
 }

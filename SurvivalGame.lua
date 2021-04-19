@@ -26,7 +26,7 @@ Rocks = Rocks or {}
 Rods = Rods or {}
 Empty_Soils = Empty_Soils or {}
 Growing_Soils = Growing_Soils or {}
-Finish_Soils = Finish_Soils or {}
+Finish_Soils = Finish_Soils or {}					 
 
 function SurvivalGame.server_onCreate( self )
 	isSurvival = true
@@ -223,7 +223,12 @@ function SurvivalGame.bindChatCommands( self )
 	sm.game.bindChatCommand( "/camself", { { "int", "toggle", true } }, "cl_onChatCommand", "Camera lock" )
 	sm.game.bindChatCommand( "/fill", { { "string", "type", true } }, "cl_onChatCommand", "Aim at a Container and use the Command on it. /fill or /fill ammo, gas, batterie, fuel, chemical, potato, water or the short variants like /fill am, ga, ch, wa, po" )
 
+
 	-- 00Fant´s code End
+		--RostigerSpielerStart
+	sm.game.bindChatCommand( "/unlim", {}, "cl_onChatCommand", "unlimited" )
+	sm.game.bindChatCommand( "/lim", {}, "cl_onChatCommand", "limited" )
+		--RostigerSpieler End
 end
 
 function SurvivalGame.client_onClientDataUpdate( self, clientData )
@@ -246,6 +251,8 @@ function SurvivalGame.loadCraftingRecipes( self )
 		dispenser = "$SURVIVAL_DATA/CraftingRecipes/dispenser.json",
 		cookbot = "$SURVIVAL_DATA/CraftingRecipes/cookbot.json",
 		craftbot = "$SURVIVAL_DATA/CraftingRecipes/craftbot.json",
+		recyclebot = "$SURVIVAL_DATA/CraftingRecipes/recyclebot.json",
+		modbot = "$SURVIVAL_DATA/CraftingRecipes/modbot.json",
 		dressbot = "$SURVIVAL_DATA/CraftingRecipes/dressbot.json"
 	})
 end
@@ -375,9 +382,9 @@ function SurvivalGame.cl_onChatCommand( self, params )
 		self.network:sendToServer( "sv_enableRestrictions", true )
 	elseif params[1] == "/decrypt" then
 		self.network:sendToServer( "sv_enableRestrictions", false )
-	elseif params[1] == "/unlimited" then
+	elseif params[1] == "/unlimited" or params[1] =="/unlim" then
 		self.network:sendToServer( "sv_setLimitedInventory", false )
-	elseif params[1] == "/limited" then
+	elseif params[1] == "/limited" or params[1] =="/lim" then
 		self.network:sendToServer( "sv_setLimitedInventory", true )
 	elseif params[1] == "/ambush" then
 		self.network:sendToServer( "sv_ambush", { magnitude = params[2] or 1, wave = params[3] } )

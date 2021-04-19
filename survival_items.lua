@@ -1,6 +1,5 @@
 -- this file is generated
 
-
 -- 00Fant Start
 
 obj_interactive_mcp = sm.uuid.new( "6245eb8d-3f76-4c37-b6b3-a12d94cd7b5b" )
@@ -30,8 +29,6 @@ obj_interactive_fant_camera = sm.uuid.new( "1501095a-63b3-4e93-adda-1950ef34e0df
 obj_interactive_fant_unitfacer_hub = sm.uuid.new( "01a21d10-a14c-4cd2-a0c4-8584453caabf" )
 
 
-
-
 obj_interactive_cfd = sm.uuid.new( "e2365e4f-27e7-4f54-b961-4b4eb371b2bd" )
 obj_interactive_fant_daylight_sensor = sm.uuid.new( "f285b388-b132-4a5e-af2d-dbf920b7950b" )
 obj_interactive_fant_anchor = sm.uuid.new( "b99153cf-1ddd-4c00-ab4e-f59c4c41dde3" )
@@ -54,7 +51,6 @@ obj_interactive_fant_gyroscope3x3 = sm.uuid.new( "cc5ff101-8beb-4e10-98de-86fc9d
 obj_interactive_fant_steamengine = sm.uuid.new( "30e7290f-594e-40b3-8a09-fb5eef728060" )
 
 obj_interactive_fant_c_engine_v8 = sm.uuid.new( "ec399c99-c311-4635-b61c-e41eaeba23d7" )
-
 
 blk_fant_block = sm.uuid.new( "f7881097-9320-4667-b2ba-4101c72b8730" )
 
@@ -140,7 +136,7 @@ weapon_fant_bazooka = sm.uuid.new( "6125d38d-687b-41fa-bbf5-80c749982c3b" )				-
 weapon_fant_watergun = sm.uuid.new( "2dd19bf4-41e1-46b6-9166-dbd8c32a9b6d" )			
 weapon_fant_watergun_obj = sm.uuid.new( "8c61b1db-4070-4f12-afcb-0fcd2515d481" )				
 weapon_fant_handheld_flamethrower = sm.uuid.new( "b03b439f-fe9d-4068-a9e9-c7c28b45a0db" )			
-weapon_fant_handheld_flamethrower_obj = sm.uuid.new( "84cef3c6-7ec2-4354-bd5c-dc88c2c5fb9b" )				
+weapon_fant_handheld_flamethrower_obj = sm.uuid.new( "84cef3c6-7ec2-4354-bd5c-dc88c2c5fb9b" )																																							 
 
 
 obj_powertools_fant_drill_small = sm.uuid.new( "846ce978-d609-4a67-b9d6-996e5c5cbd16" )
@@ -234,7 +230,6 @@ fant_straw_dog_tail  		= sm.uuid.new( "6b26ba5d-3db2-4769-aef8-cf87f29bee71" )
 -- Plantables
 obj_seed_eggplant = sm.uuid.new( "44b03130-28c6-4060-903f-9a96fb7f7fe0" )
 obj_plantables_eggplant = sm.uuid.new( "fae02274-5293-4f79-8727-6ca1d4e9a9e9" )
-
 -- 00Fant End
 
 
@@ -249,6 +244,112 @@ obj_interactive_stafftoilet = sm.uuid.new( "8694192c-d91b-444c-a184-910911bbb354
 ----------------------------------------
 -- blocks.json
 ----------------------------------------
+--RostigerSpieler Start
+t_tiled_galvanizedmetal = sm.uuid.new( "e5314b5b-2180-4c9e-9420-f0bd12adf255" )
+t_tiled_redmetal = sm.uuid.new( "8173bc5f-eed0-43cc-a31e-4e13d732eec1" )
+blk_metal04 = sm.uuid.new( "d5b8959e-bb7c-4e6b-a4b0-13b43bc8cf94" )
+obj_extra_small_wheel = sm.uuid.new( "70ff482c-cd0c-4321-a9b1-363e84cb8f0d" )
+obj_football = sm.uuid.new( "12be421f-dd83-4274-a99e-96181d38dd71" )
+obj_radiox2 = sm.uuid.new( "c7bb8168-05f0-44f8-9020-174e2970041f" )
+obj_radiox3 = sm.uuid.new( "4dbc6a40-42a1-4272-95f5-ecfdad2d04c7" )
+obj_glovebox2 = sm.uuid.new( "fe33f9a6-5222-4238-a9cd-eb8ce25d5429" )
+obj_glovebox3 = sm.uuid.new ( "c039e931-bba6-4400-ac9c-403b4474fe50" )
+obj_rocketsmall = sm.uuid.new ( "ea58e070-1b1a-4a7b-868a-8385665aca0c" )
+obj_rocketbig = sm.uuid.new ( "445a4917-0ab8-49cc-a1d8-555cc4438269" )
+obj_tiny_beacon = sm.uuid.new ( "4e5cd291-616a-4bad-b7f8-c1bec83d89cf" )
+propeller_silencer_pipe = sm.uuid.new ( "8511b4c0-d720-418a-92f7-6eb35340d67f" )
+blinker_corner_light = sm.uuid.new ( "30b24862-2837-40e5-8e9f-0d42ad645df2" )
+corner_front_light = sm.uuid.new ( "ed1e6ab0-56a6-4545-8fac-6803ab28f7ce" )
+gas_cap_door = sm.uuid.new ( "3af30686-cba1-4ef5-b905-ff6d707f8f18" )
+interactive_grill = sm.uuid.new ( "28392099-eb9f-45fb-ae18-b706782a6df1" )
+elevator_signal_light = sm.uuid.new ( "476052d5-dfef-4fe5-8d7d-a34047c17220" )
+interactive_steering_wheel = sm.uuid.new ( "c75f820e-617d-4184-89a7-fa53a82e073b" )
+wiperx5 = sm.uuid.new ( "00ca58a1-3772-40ec-bcef-855122b7c354" )
+wiperx7 = sm.uuid.new ( "3db847f9-851c-4bd7-8853-2c2203f23989" )
+wiperx9 = sm.uuid.new ( "d74f2674-2361-4847-8952-1955f878263e" )
+rally_light1 = sm.uuid.new ( "3005de76-1ca7-4407-8a52-7216af72a2c0" )
+rally_light2 = sm.uuid.new ( "9f679dff-0a05-407e-8ba5-0a1ec649f2ed" )
+Truck_Front_Wheel = sm.uuid.new ( "1ebd3dd9-b84c-49f7-b5df-841afb072d94" )
+Truck_Back_Wheel = sm.uuid.new ( "7c017b3d-205f-461b-bd90-a918e22a0b6d" )
+doorhandle_button = sm.uuid.new ( "cf49af83-12e0-44d0-8289-683bd796e574" )
+doorhandle_switch = sm.uuid.new ( "8a01e939-4441-4eba-bd5a-21525a926776" )
+obj_radiox2 = sm.uuid.new ( "c7bb8168-05f0-44f8-9020-174e2970041f" )
+obj_radiox3 = sm.uuid.new ( "4dbc6a40-42a1-4272-95f5-ecfdad2d04c7" )
+obj_glovebox2 = sm.uuid.new ( "fe33f9a6-5222-4238-a9cd-eb8ce25d5429" )
+obj_glovebox3 = sm.uuid.new ( "c039e931-bba6-4400-ac9c-403b4474fe50" )
+obj_rocketsmall = sm.uuid.new ( "ea58e070-1b1a-4a7b-868a-8385665aca0c" )
+obj_rocketbig = sm.uuid.new ( "445a4917-0ab8-49cc-a1d8-555cc4438269" )
+obj_tiny_beacon = sm.uuid.new ( "4e5cd291-616a-4bad-b7f8-c1bec83d89cf" )
+racer_seat_1 = sm.uuid.new ( "fb9a84e6-9ef1-4ff5-adc5-20a133a4e0f2" )
+speedometer1 = sm.uuid.new ( "a5d7e8b0-bd33-49ac-ab18-e181906140d0" )
+speedometer2 = sm.uuid.new ( "9bf356e8-4353-437b-a6de-1b4c4ef6d489" )
+futuristic_dashboard_vent1 = sm.uuid.new ( "1c181717-bae4-400d-8072-ac1fa16ce091" )
+dashboard_vent1 = sm.uuid.new ( "870c12dd-7b64-40cf-9ac5-87291b3a4b13" )
+pedal_switch1 = sm.uuid.new ( "3e3da5c8-d914-4a81-b7d6-9d7f1b3f405c" )
+pedal_button1 = sm.uuid.new ( "ef495d68-e824-4e76-90c7-ae6530bc7312" )
+eck_controller = sm.uuid.new ( "29bfcf5e-8305-4d45-8370-b27e56992f24" )
+handbrake_switchbig1 = sm.uuid.new ( "3bf6e69e-4aaa-4184-9890-35541cddb9e0" )
+toggle_switch1 = sm.uuid.new ( "4672fc5d-bc98-4f2d-a3a7-c6590eca22ce" )
+schalthebel_switch1 = sm.uuid.new ( "67e6af18-beee-4b19-8e4a-00dd97cbacf8" )
+start_switch1 = sm.uuid.new ( "553cf281-92c5-40ad-ae6e-2099ff1002f1" )
+start_button1 = sm.uuid.new ( "7b6a3e96-17f8-4ed6-af58-23789e8c6b3c" )
+headrest = sm.uuid.new ( "645a78f8-15b4-407d-804e-bd9c6cffe743" )
+mod_driver_seat_vertical = sm.uuid.new ( "0bb4eb93-5a58-4b3b-b7a7-cea69caddc3e" )
+mod_passenger_seat_vertical_x3 = sm.uuid.new ( "8f0c8595-e592-473b-a620-63e3bef9170d" )
+obj_respawn_seat = sm.uuid.new ( "f56aae40-4631-4ce3-a090-9432ab14b173" )
+
+obj_5x1RearFender = sm.uuid.new ( "2b6396aa-0bde-4894-a796-0244bf4335fa" )
+obj_5x2RearFender = sm.uuid.new ( "581356bc-30c9-4c14-b3b3-e35e53609e20" )
+obj_5x3RearFender = sm.uuid.new ( "38d4ee7c-e838-4c78-8d65-9c10ed785003" )
+obj_5x1FrontFender = sm.uuid.new ( "e461e045-6403-4700-a654-2c5f15ec4f37" )
+obj_5x2FrontFender = sm.uuid.new ( "d2643510-3d94-4170-b969-d577226096f6" )
+obj_5x3FrontFender = sm.uuid.new ( "aebaf51d-d895-4ccf-a22e-8ac7e79c0fa0" )
+obj_Big5x1Fender = sm.uuid.new ( "7004b97e-3eaa-4870-a6ce-75d9e9f4afd8" )
+obj_FenderShort5x1Wedge = sm.uuid.new ( "1f0ff7ca-d048-469c-af34-0c9051cf0320" )
+obj_FenderBigWedge5x1 = sm.uuid.new ( "4d2e010b-ee48-4b2b-9f2f-5eba77378b66" )
+obj_FenderShortWedge5x1 = sm.uuid.new ( "bb02c340-4a39-45cc-be90-c7356dca8008" )
+obj_FenderBigCurve5x1 = sm.uuid.new ( "f0e86ce7-3bb6-498f-a738-10429daf0369" )
+obj_truckengineV8big = sm.uuid.new ( "bd478fcc-5d9d-41e2-8c38-6d0f43f0262c" )
+obj_invisible_bearing = sm.uuid.new ( "4bfc6a1a-ab67-4a9e-9458-b46354e135e1" )
+obj_mini_bearing = sm.uuid.new ( "0f5b0142-50dc-4d31-8a79-fba733b7183e" )
+obj_wooddoor2 = sm.uuid.new ( "c93089af-4b65-4976-8c72-007f086ddc75" )
+obj_wooddoorwithglass = sm.uuid.new ( "e6c98fa3-6524-4ec7-ad01-37ff4bc3111f" )
+obj_wooddoorbigglass = sm.uuid.new ( "b66ae611-1b2a-4e3c-af10-959ad82c8424" )
+obj_warehousedoor = sm.uuid.new ( "1ce4e82c-5b87-4b54-a6b8-1501e64c7236" )
+obj_glassdoor = sm.uuid.new ( "ddc33bbd-f747-4e8a-873f-8494e6a9e62d" )
+obj_sidemirror_left = sm.uuid.new ( "5cebbec0-b310-4db8-b6f3-f19822b38424"  )
+obj_sidemirror_right = sm.uuid.new ( "75e69b95-ec67-455c-b203-7f293e2ea394" )
+obj_mirror_inside = sm.uuid.new ( "699a77c0-cb23-4e92-bde3-27d6a2a2f9f1" )
+obj_truckmirror_big = sm.uuid.new ( "d8aca2b2-2466-4b5b-a712-d7924200d582" )
+
+obj_ship_propeller_1X3 = sm.uuid.new ( "d9aafdde-0fe7-4b80-8c39-d2a46f15c3a3" )
+obj_ship_propeller_1X5 = sm.uuid.new ( "502a40ae-72d0-45ca-9cd1-03f20a21d259" )
+
+blk_bevelled_brick_block_1 = sm.uuid.new (  "2da11432-2424-4a4b-9af9-26038801edb0" )
+blk_bevelled_brick_block_2 = sm.uuid.new (  "7e643315-60dc-49f0-a012-f608c5b4faa0" )
+blk_curved_brick_block_1 = sm.uuid.new (  "bf52f689-df5f-4e36-926f-0e5e47539342" )
+blk_curved_brick_block_2 = sm.uuid.new (  "781ba50f-4c38-44a3-b854-8ac63b4bf928" )
+blk_wedge_brick_block_1 = sm.uuid.new (  "30aa7d84-878d-4aed-aeb4-4d439530caf2" )
+blk_wedge_brick_block_2 = sm.uuid.new (  "bab7beee-805b-46da-aa84-0c9b161d26cd" )
+blk_bevelled_concrete_block = sm.uuid.new (  "33e999da-c4c6-49e2-8b35-d731ae75993b" )
+blk_curved_concrete_block = sm.uuid.new (  "436693cb-43e5-4b52-910a-2537803a72c5" )
+blk_wedge_concrete_block = sm.uuid.new (  "0a2a56a9-1422-4814-b99b-db9ce2dad988" )
+blk_bevelled_wood_block = sm.uuid.new (  "62f3a5df-c4c7-4b13-9699-58cd2e952e45" )
+blk_curved_wood_block = sm.uuid.new (   "447e832a-c8a3-47cf-ba9f-58efb59b7210" )
+blk_wedge_wood_block = sm.uuid.new (   "e5bec777-7df9-4b4b-ab28-1307700de360" )
+blk_bevelled_metal_block = sm.uuid.new (  "66cd0a73-31ba-4c19-a8cd-43488cf45247" )
+blk_curved_metal_block = sm.uuid.new (  "6c7039e8-f246-4ba1-988d-7d65311eea42" )
+blk_wedge_metal_block = sm.uuid.new (  "2ac5d81d-f9fc-4792-ada2-f476ee2e0e1a" )
+blk_bevelled_tile_block = sm.uuid.new (  "81ff7cb6-4ee2-4c1a-9bf0-1bb63eb100f6" )
+blk_curved_tile_block = sm.uuid.new (   "5b0569bd-e1f1-4488-b629-76ee5db0d97e" )
+blk_wedge_tile_block = sm.uuid.new (   "4372c163-2681-4064-9576-e19aac3bd252" )
+blk_bevelled_spaceship_block = sm.uuid.new (  "428bf320-daa6-4f61-a50e-d72ef193041d" )
+blk_curved_spaceship_block = sm.uuid.new (  "4f0f71ef-8fd7-41ec-b530-6b2b47dc7919" )
+blk_wedge_spaceship_block = sm.uuid.new (  "dce6323d-9228-4ca9-b741-383aa6f3e924" )
+blk_bubblewrap2 = sm.uuid.new ( "d718f5d3-12f4-4e8f-b634-4b40264ebd34" )
+obj_interactive_trigger_block = sm.uuid.new ( "68d88046-6690-4e7c-b47f-34bba28376e0" )
+
+--RostigerSpieler End
 blk_scrapwood = sm.uuid.new( "1fc74a28-addb-451a-878d-c3c605d63811" )
 blk_wood1 = sm.uuid.new( "df953d9c-234f-4ac2-af5e-f0490b223e71" )
 blk_wood2 = sm.uuid.new( "1897ee42-0291-43e4-9645-8c5a5d310398" )
@@ -292,6 +393,7 @@ blk_treadplate = sm.uuid.new( "f7d4bfed-1093-49b9-be32-394c872a1ef4" )
 blk_warehousefloor = sm.uuid.new( "3e3242e4-1791-4f70-8d1d-0ae9ba3ee94c" )
 blk_wornmetal = sm.uuid.new( "d740a27d-cc0f-4866-9e07-6a5c516ad719" )
 blk_framework = sm.uuid.new( "c4a2ffa8-c245-41fb-9496-966c6ee4648b" )
+blk_fittings_glassedge = sm.uuid.new( "b3cd4c0a-90a1-4df7-b2b8-093f5352c1ea" )
 
 ----------------------------------------
 -- building.json
@@ -340,6 +442,11 @@ obj_consumable_carrotburger = sm.uuid.new( "54d8ef21-357d-48a3-a66d-40446f6bb686
 obj_consumable_pizzaburger = sm.uuid.new( "54d84731-d9ec-435d-bc9d-d48e0763b1bf" )
 obj_consumable_longsandwich = sm.uuid.new( "e243f642-6934-42bb-8cdd-f8ff1704d411" )
 obj_consumable_milk = sm.uuid.new( "2c4a2633-153a-4800-ba3d-2ac0d993b9c8" )
+obj_consumable_gas = sm.uuid.new( "d4d68946-aa03-4b8f-b1af-96b81ad4e305" )
+--EDIT Biofuel Mod
+obj_consumable_biofuel = sm.uuid.new( "7447f59d-9239-43a3-ad32-2894c8e3024f" )
+--EDIT END Biofuel Mod
+obj_consumable_battery = sm.uuid.new( "910a7f2c-52b0-46eb-8873-ad13255539af" )
 obj_consumable_water = sm.uuid.new( "869d4736-289a-4952-96cd-8a40117a2d28" )
 obj_consumable_fertilizer = sm.uuid.new( "ac0b5b0a-14e1-4b31-8944-0a351fbfcc67" )
 obj_consumable_chemical = sm.uuid.new( "f74c2891-79a9-45e0-982e-4896651c2e25" )
@@ -352,6 +459,9 @@ obj_consumable_soilbag = sm.uuid.new( "9a3e478c-2224-44fa-887c-239965bd05ad" )
 -- containers.json
 ----------------------------------------
 obj_container_gas = sm.uuid.new( "056e5ff1-f030-40df-946a-b830bf494c92" )
+--EDIT Biofuel Mod
+obj_container_biofuel = sm.uuid.new( "8707e373-8aeb-4ce0-ba15-58a80941cc99" )
+--EDIT END Biofuel Mod
 obj_container_water = sm.uuid.new( "ea10d1af-b97a-46fb-8895-dfd1becb53bb" )
 obj_container_fertilizer = sm.uuid.new( "76331bbf-abbd-4b8d-bb54-f721a5b6193b" )
 obj_container_battery = sm.uuid.new( "da4833fd-f981-4e08-a9f7-48e630a7c146" )
@@ -560,7 +670,7 @@ obj_fittings_generatorpipemulti = sm.uuid.new( "c85957a1-c393-4352-ba79-5004bb4f
 obj_consumable_gas = sm.uuid.new( "d4d68946-aa03-4b8f-b1af-96b81ad4e305" )
 obj_consumable_battery = sm.uuid.new( "910a7f2c-52b0-46eb-8873-ad13255539af" )
 
-----------------------------------------
+----------------------------------------								
 -- harvest.json
 ----------------------------------------
 obj_harvest_wood = sm.uuid.new( "968de65c-75f3-471b-954e-6165a4b6d3d6" )
@@ -718,6 +828,13 @@ obj_interactive_gasengine_02 = sm.uuid.new( "33d01ddd-f32b-4a9a-87d6-efb6710b389
 obj_interactive_gasengine_03 = sm.uuid.new( "470b9a92-ed94-4ef2-b1ea-b45f47ef0982" )
 obj_interactive_gasengine_04 = sm.uuid.new( "bfcaac1a-5a7f-4fba-9980-1159617a7212" )
 obj_interactive_gasengine_05 = sm.uuid.new( "3091926a-9340-46d9-83d6-4fd7c68ad950" )
+--EDIT Biofuel Mod
+obj_interactive_bioengine_01 = sm.uuid.new( "069d23e4-7de6-46a6-b0e1-f0a1a5ec7c62" )
+obj_interactive_bioengine_02 = sm.uuid.new( "944ca2b8-7e51-49d8-bf7a-949ed5832995" )
+obj_interactive_bioengine_03 = sm.uuid.new( "439aa892-924a-43c1-848f-ee5f1bf83ef5" )
+obj_interactive_bioengine_04 = sm.uuid.new( "d1c71bff-bb91-45f4-95e4-69e2eb3ca64d" )
+obj_interactive_bioengine_05 = sm.uuid.new( "8cf15486-e9f7-482f-aa5d-a3cad47e64f6" )
+--EDIT END Biofuel Mod
 obj_interactive_electricengine_01 = sm.uuid.new( "5e5d231e-405e-4f45-9bd0-b3557dbb42eb" )
 obj_interactive_electricengine_02 = sm.uuid.new( "0c9cc5bb-af2f-4023-b8d8-cd7d52a60efe" )
 obj_interactive_electricengine_03 = sm.uuid.new( "56cea967-a685-494d-85ef-3aa121a0c193" )
@@ -755,7 +872,7 @@ obj_interactive_watergun = sm.uuid.new( "69559e81-50fa-40ae-afa2-a22c1a49eb54" )
 obj_interactive_mountablespudgun = sm.uuid.new( "454ad69d-bac2-4b06-9386-6267bcbfece2" )
 obj_interactive_encryptor_destruction = sm.uuid.new( "c8b1bc7b-304e-44ce-9ca1-937b8e69d70c" )
 obj_interactive_encryptor_connection = sm.uuid.new( "8fd2cf31-70b3-499a-bfb0-7e3d2c580258" )
-obj_interactive_beacon = sm.uuid.new( "a5985971-1f95-4373-a5d9-4ce0a3e74851" )
+obj_interactive_beacon = sm.uuid.new( "a5985971-1f95-4373-a5d9-4ce0a3e74851" )																			  
 
 ----------------------------------------
 -- lights.json

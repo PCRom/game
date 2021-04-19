@@ -1,15 +1,15 @@
--- GasEngine.lua --
+-- BioEngine.lua --
 dofile("$SURVIVAL_DATA/Scripts/game/survival_constants.lua")
 dofile("$SURVIVAL_DATA/Scripts/game/survival_items.lua")
 
-GasEngine = class()
-GasEngine.maxParentCount = 2
-GasEngine.maxChildCount = 255
-GasEngine.connectionInput = sm.interactable.connectionType.logic + sm.interactable.connectionType.power + sm.interactable.connectionType.gasoline
-GasEngine.connectionOutput = sm.interactable.connectionType.bearing
-GasEngine.colorNormal = sm.color.new( 0xff8000ff )
-GasEngine.colorHighlight = sm.color.new( 0xff9f3aff )
-GasEngine.poseWeightCount = 1
+BioEngine = class()
+BioEngine.maxParentCount = 2
+BioEngine.maxChildCount = 255
+BioEngine.connectionInput = sm.interactable.connectionType.logic + sm.interactable.connectionType.power + sm.interactable.connectionType.gasoline + sm.interactable.connectionType.gasoline
+BioEngine.connectionOutput = sm.interactable.connectionType.bearing
+BioEngine.colorNormal = sm.color.new( 0xff8000ff )
+BioEngine.colorHighlight = sm.color.new( 0xff9f3aff )
+BioEngine.poseWeightCount = 1
 
 local ScrapGears = {
 	{ power = 0 },
@@ -20,90 +20,68 @@ local ScrapGears = {
 
 local Gears = {
 	{ power = 0 },
-	{ power = 30 },
-	{ power = 60 },
-	{ power = 90 },
-	{ power = 150 }, -- 1
-	{ power = 240 },
-	{ power = 390 }, -- 2
-	{ power = 630 },
-	{ power = 1020 }, -- 3
-	{ power = 1650 },
-	{ power = 2670 }, -- 4
-	{ power = 4320 },
-	{ power = 6990 }, -- 5
+	{ power = 25 },
+	{ power = 50 },
+	{ power = 75 },
+	{ power = 125 }, -- 1
+	{ power = 200 },
+	{ power = 325 }, -- 2
+	{ power = 525 },
+	{ power = 850 }, -- 3
+	{ power = 1270 },
+	{ power = 2750 }, -- 4
+	{ power = 3600 },
+	{ power = 5825 }, -- 5
 }
-
---[[
-local gearsFromCreative = {
-	{ power = 0 },
-	{ power = 8 },
-	{ power = 16 },
-	{ power = 32 },
-	{ power = 64 },
-	{ power = 128 },
-	{ power = 256 },
-	{ power = 512 },
-	{ power = 1024 }
-}
-]]
 
 local EngineLevels = {
-	[tostring(obj_scrap_gasengine)] = {
-		gears = ScrapGears,
-		effect = "GasEngine - Scrap",
-		title = "#{CONTROLLER_ENGINE_GAS_SCRAP}",
-		gearCount = #ScrapGears,
-		bearingCount = 2,
-		pointsPerFuel = 3000
-	},
-	[tostring(obj_interactive_gasengine_01)] = {
+	[tostring(obj_interactive_bioengine_01)] = {
 		gears = Gears,
 		effect = "GasEngine - Level 1",
-		upgrade = tostring(obj_interactive_gasengine_02),
+		upgrade = tostring(obj_interactive_bioengine_02),
 		cost = 4,
-		title = "#{LEVEL} 1",
+		title = "LEVEL 1",
 		gearCount = 5,
 		bearingCount = 2,
-		pointsPerFuel = 4000
+		pointsPerFuel = 3500
 	},
-	[tostring(obj_interactive_gasengine_02)] = {
+	[tostring(obj_interactive_bioengine_02)] = {
 		gears = Gears,
 		effect = "GasEngine - Level 2",
-		upgrade = tostring(obj_interactive_gasengine_03),
+		upgrade = tostring(obj_interactive_bioengine_03),
 		cost = 6,
-		title = "#{LEVEL} 2",
+		title = "LEVEL 2",
 		gearCount = 7,
 		bearingCount = 4,
-		pointsPerFuel = 6000
+		pointsPerFuel = 5000
 	},
-	[tostring(obj_interactive_gasengine_03)] = {
+	[tostring(obj_interactive_bioengine_03)] = {
 		gears = Gears,
 		effect = "GasEngine - Level 3",
-		upgrade = tostring(obj_interactive_gasengine_04),
+		upgrade = tostring(obj_interactive_bioengine_04),
 		cost = 8,
-		title = "#{LEVEL} 3",
+		title = "LEVEL 3",
 		gearCount = 9,
 		bearingCount = 6,
-		pointsPerFuel = 9000
+		pointsPerFuel = 7500
 	},
-	[tostring(obj_interactive_gasengine_04)] = {
+	[tostring(obj_interactive_bioengine_04)] = {
 		gears = Gears,
 		effect = "GasEngine - Level 4",
-		upgrade = tostring(obj_interactive_gasengine_05),
+		upgrade = tostring(obj_interactive_bioengine_05),
 		cost = 10,
-		title = "#{LEVEL} 4",
+		title = "LEVEL 4",
 		gearCount = 11,
 		bearingCount = 8,
-		pointsPerFuel = 12000
+		pointsPerFuel = 10000
 	},
-	[tostring(obj_interactive_gasengine_05)] = {
+	[tostring(obj_interactive_bioengine_05)] = {
 		gears = Gears,
 		effect = "GasEngine - Level 5",
-		title = "#{LEVEL} 5",
+		title = "LEVEL 5",
 		gearCount = #Gears,
 		bearingCount = 10,
-		pointsPerFuel = 20000
+		pointsPerFuel = 17500
 	}
 }
 
@@ -112,12 +90,12 @@ local RadPerSecond_1MeterPerSecondOn3BlockDiameterTyres = 2.6666667
 
 --[[ Server ]]
 
-function GasEngine.server_onCreate( self )
+function BioEngine.server_onCreate( self )
 	local container = self.shape.interactable:getContainer( 0 )
 	if not container then
-		container = self.shape:getInteractable():addContainer( 0, 1, 20 )
+		container = self.shape:getInteractable():addContainer( 0, 1, 10 )
 	end
-	container:setFilters( { obj_consumable_gas } )
+	container:setFilters( { obj_consumable_biofuel } )
 
 	local level = EngineLevels[tostring( self.shape:getShapeUuid() )]
 	assert(level)
@@ -134,11 +112,11 @@ function GasEngine.server_onCreate( self )
 	self:server_init()
 end
 
-function GasEngine.server_onRefresh( self )
+function BioEngine.server_onRefresh( self )
 	self:server_init()
 end
 
-function GasEngine.server_init( self )
+function BioEngine.server_init( self )
 
 	self.saved = self.storage:load()
 	if self.saved == nil then
@@ -162,20 +140,20 @@ function GasEngine.server_init( self )
 	self:sv_setGear( self.saved.gearIdx )
 end
 
-function GasEngine.sv_setGear( self, gearIdx )
+function BioEngine.sv_setGear( self, gearIdx )
 	self.saved.gearIdx = gearIdx
 	self.dirtyStorageTable = true
 	self.dirtyClientTable = true
 end
 
-function GasEngine.sv_updateFuelStatus( self, fuelContainer )
+function BioEngine.sv_updateFuelStatus( self, fuelContainer )
 
 	if self.saved.fuelPoints ~= self.fuelPoints then
 		self.saved.fuelPoints = self.fuelPoints
 		self.dirtyStorageTable = true
 	end
 
-	local hasFuel = ( self.fuelPoints > 0 ) or sm.container.canSpend( fuelContainer, obj_consumable_gas, 1 )
+	local hasFuel = ( self.fuelPoints > 0 ) or sm.container.canSpend( fuelContainer, obj_consumable_biofuel, 1 )
 	if self.hasFuel ~= hasFuel then
 		self.hasFuel = hasFuel
 		self.dirtyClientTable = true
@@ -183,7 +161,7 @@ function GasEngine.sv_updateFuelStatus( self, fuelContainer )
 
 end
 
-function GasEngine.controlEngine( self, direction, active, timeStep, gearIdx )
+function BioEngine.controlEngine( self, direction, active, timeStep, gearIdx )
 
 	direction = clamp( direction, -1, 1 )
 	if ( math.abs( direction ) > 0 or not active ) then
@@ -215,7 +193,7 @@ function GasEngine.controlEngine( self, direction, active, timeStep, gearIdx )
 	end
 end
 
-function GasEngine.getInputs( self )
+function BioEngine.getInputs( self )
 
 	local parents = self.interactable:getParents()
 	local active = true
@@ -232,7 +210,7 @@ function GasEngine.getInputs( self )
 			direction = parents[2]:getPower()
 			hasInput = true
 		end
-		if parents[2]:hasOutputType( sm.interactable.connectionType.gasoline ) then
+		if parents[2]:hasOutputType( sm.interactable.connectionType.gasoline + sm.interactable.connectionType.gasoline ) then
 			fuelContainer = parents[2]:getContainer( 0 )
 		end
 	end
@@ -246,7 +224,7 @@ function GasEngine.getInputs( self )
 			direction = parents[1]:getPower()
 			hasInput = true
 		end
-		if parents[1]:hasOutputType( sm.interactable.connectionType.gasoline ) then
+		if parents[1]:hasOutputType( sm.interactable.connectionType.gasoline + sm.interactable.connectionType.gasoline ) then
 			fuelContainer = parents[1]:getContainer( 0 )
 		end
 	end
@@ -255,13 +233,12 @@ function GasEngine.getInputs( self )
 
 end
 
-function GasEngine.server_onFixedUpdate( self, timeStep )
+function BioEngine.server_onFixedUpdate( self, timeStep )
 
 	-- Check engine connections
 	local hadInput = self.hasInput == nil and true or self.hasInput --Pretend to have had input if nil to avoid starting engines at load
 	local active, direction, fuelContainer, hasInput = self:getInputs()
 	self.hasInput = hasInput
-	local useCreativeFuel = not sm.game.getEnableFuelConsumption() and fuelContainer == nil
 
 	-- Check fuel container
 	if not fuelContainer or fuelContainer:isEmpty() then
@@ -287,11 +264,11 @@ function GasEngine.server_onFixedUpdate( self, timeStep )
 	-- Consume fuel for fuel points
 	local canSpend = false
 	if self.fuelPoints <= 0 then
-		canSpend = sm.container.canSpend( fuelContainer, obj_consumable_gas, 1 )
+		canSpend = sm.container.canSpend( fuelContainer, obj_consumable_biofuel, 1 )
 	end
 
 	-- Control engine
-	if self.fuelPoints > 0 or canSpend or useCreativeFuel then
+	if self.fuelPoints > 0 or canSpend then
 
 		if hasInput == false then
 			self.power = 1
@@ -300,25 +277,23 @@ function GasEngine.server_onFixedUpdate( self, timeStep )
 			self:controlEngine( direction, active, timeStep, self.saved.gearIdx )
 		end
 
-		if not useCreativeFuel then
-			-- Consume fuel points
-			local appliedImpulseCost = 0.015625
-			local fuelCost = 0
-			for _, bearing in ipairs( bearings ) do
-				if bearing.appliedImpulse * bearing.angularVelocity < 0 then -- No added fuel cost if the bearing is decelerating
-					fuelCost = fuelCost + math.abs( bearing.appliedImpulse ) * appliedImpulseCost
-				end
+		-- Consume fuel points
+		local appliedImpulseCost = 0.015625
+		local fuelCost = 0
+		for _, bearing in ipairs( bearings ) do
+			if bearing.appliedImpulse * bearing.angularVelocity < 0 then -- No added fuel cost if the bearing is decelerating
+				fuelCost = fuelCost + math.abs( bearing.appliedImpulse ) * appliedImpulseCost
 			end
-			fuelCost = math.min( fuelCost, math.sqrt( fuelCost / 7.5 ) * 7.5 )
+		end
+		fuelCost = math.min( fuelCost, math.sqrt( fuelCost / 7.5 ) * 7.5 )
 
-			self.fuelPoints = self.fuelPoints - fuelCost
+		self.fuelPoints = self.fuelPoints - fuelCost
 
-			if self.fuelPoints <= 0 and fuelCost > 0 then
-				sm.container.beginTransaction()
-				sm.container.spend( fuelContainer, obj_consumable_gas, 1, true )
-				if sm.container.endTransaction() then
-					self.fuelPoints = self.fuelPoints + self.pointsPerFuel
-				end
+		if self.fuelPoints <= 0 and fuelCost > 0 then
+			sm.container.beginTransaction()
+			sm.container.spend( fuelContainer, obj_consumable_biofuel, 1, true )
+			if sm.container.endTransaction() then
+				self.fuelPoints = self.fuelPoints + self.pointsPerFuel
 			end
 		end
 
@@ -341,14 +316,14 @@ function GasEngine.server_onFixedUpdate( self, timeStep )
 
 	-- Client table dirty
 	if self.dirtyClientTable then
-		self.network:setClientData( { gearIdx = self.saved.gearIdx, engineHasFuel = self.hasFuel or useCreativeFuel, scrapOffset = self.scrapOffset } )
+		self.network:setClientData( { gearIdx = self.saved.gearIdx, engineHasFuel = self.hasFuel, scrapOffset = self.scrapOffset } )
 		self.dirtyClientTable = false
 	end
 end
 
 --[[ Client ]]
 
-function GasEngine.client_onCreate( self )
+function BioEngine.client_onCreate( self )
 	local level = EngineLevels[tostring( self.shape:getShapeUuid() )]
 	self.gears = level.gears
 	self.client_gearIdx = 1
@@ -358,7 +333,7 @@ function GasEngine.client_onCreate( self )
 	self.power = 0
 end
 
-function GasEngine.client_onClientDataUpdate( self, params )
+function BioEngine.client_onClientDataUpdate( self, params )
 
 	if self.gui then
 		if self.gui:isActive() and params.gearIdx ~= self.client_gearIdx then
@@ -388,7 +363,7 @@ function GasEngine.client_onClientDataUpdate( self, params )
 	self.scrapOffset = params.scrapOffset
 end
 
-function GasEngine.client_onDestroy( self )
+function BioEngine.client_onDestroy( self )
 	self.effect:destroy()
 
 	if self.gui then
@@ -398,7 +373,7 @@ function GasEngine.client_onDestroy( self )
 	end
 end
 
-function GasEngine.client_onFixedUpdate( self, timeStep )
+function BioEngine.client_onFixedUpdate( self, timeStep )
 
 	local active, direction, externalFuelTank, hasInput = self:getInputs()
 
@@ -440,19 +415,19 @@ function GasEngine.client_onFixedUpdate( self, timeStep )
 	end
 end
 
-function GasEngine.client_onUpdate( self, dt )
+function BioEngine.client_onUpdate( self, dt )
 
 	local active, direction = self:getInputs()
 
 	self:cl_updateEffect( direction, active )
 end
 
-function GasEngine.client_onInteract( self, character, state )
+function BioEngine.client_onInteract( self, character, state )
 	if state == true then
 		self.gui = sm.gui.createEngineGui()
 
-		self.gui:setText( "Name", "#{CONTROLLER_ENGINE_GAS_TITLE}" )
-		self.gui:setText( "Interaction", "#{CONTROLLER_ENGINE_INSTRUCTION}" )
+		self.gui:setText( "Name", "B I O   E N G I N E" )
+		self.gui:setText( "Interaction", "Drag to adjust engine power" )
 		self.gui:setOnCloseCallback( "cl_onGuiClosed" )
 		self.gui:setSliderCallback( "Setting", "cl_onSliderChange" )
 		self.gui:setSliderData( "Setting", #self.gears, self.client_gearIdx - 1 )
@@ -466,13 +441,9 @@ function GasEngine.client_onInteract( self, character, state )
 		end
 
 		local _, _, externalFuelContainer, _ = self:getInputs()
+
 		if externalFuelContainer then
 			self.gui:setVisible( "FuelContainer", true )
-		end
-
-		if not sm.game.getEnableFuelConsumption() then
-			self.gui:setVisible( "BackgroundGas", false )
-			self.gui:setVisible( "FuelGrid", false )
 		end
 
 		self.gui:open()
@@ -492,14 +463,11 @@ function GasEngine.client_onInteract( self, character, state )
 			self.gui:setSliderRangeLimit( "Setting", level.gearCount )
 
 			if level.cost then
-				if not sm.game.getEnableUpgradeCost() then
-					self.gui:setData( "Upgrade", { cost = level.cost, available = 1000 } )
-				else
-					local inventory = sm.localPlayer.getPlayer():getInventory()
-					local availableKits = sm.container.totalQuantity( inventory, obj_consumable_component )
-					local upgradeData = { cost = level.cost, available = availableKits }
-					self.gui:setData( "Upgrade", upgradeData )
-				end
+				local inventory = sm.localPlayer.getPlayer():getInventory()
+				local availableKits = sm.container.totalQuantity( inventory, obj_consumable_component )
+
+				local upgradeData = { cost = level.cost, available = availableKits }
+				self.gui:setData( "Upgrade", upgradeData )
 			else
 				self.gui:setVisible( "Upgrade", false )
 			end
@@ -507,17 +475,20 @@ function GasEngine.client_onInteract( self, character, state )
 	end
 end
 
-function GasEngine.client_getAvailableParentConnectionCount( self, connectionType )
+function BioEngine.client_getAvailableParentConnectionCount( self, connectionType )
 	if bit.band( connectionType, bit.bor( sm.interactable.connectionType.logic, sm.interactable.connectionType.power ) ) ~= 0 then
 		return 1 - #self.interactable:getParents( bit.bor( sm.interactable.connectionType.logic, sm.interactable.connectionType.power ) )
 	end
 	if bit.band( connectionType, sm.interactable.connectionType.gasoline ) ~= 0 then
 		return 1 - #self.interactable:getParents( sm.interactable.connectionType.gasoline )
 	end
+	if bit.band( connectionType, sm.interactable.connectionType.gasoline + sm.interactable.connectionType.gasoline ) ~= 0 then
+		return 1 - #self.interactable:getParents( sm.interactable.connectionType.gasoline + sm.interactable.connectionType.gasoline)
+	end
 	return 0
 end
 
-function GasEngine.client_getAvailableChildConnectionCount( self, connectionType )
+function BioEngine.client_getAvailableChildConnectionCount( self, connectionType )
 	if connectionType ~= sm.interactable.connectionType.bearing then
 		return 0
 	end
@@ -527,22 +498,22 @@ function GasEngine.client_getAvailableChildConnectionCount( self, connectionType
 	return maxBearingCount - #self.interactable:getChildren( sm.interactable.connectionType.bearing )
 end
 
-function GasEngine.cl_onGuiClosed( self )
+function BioEngine.cl_onGuiClosed( self )
 	self.gui:destroy()
 	self.gui = nil
 end
-
-function GasEngine.cl_onSliderChange( self, sliderName, sliderPos )
+--may be problem
+function BioEngine.cl_onSliderChange( self, sliderName, sliderPos )
 	self.network:sendToServer( "sv_setGear", sliderPos + 1 )
 	self.client_gearIdx = sliderPos + 1
 end
 
-function GasEngine.cl_onUpgradeClicked( self, buttonName )
+function BioEngine.cl_onUpgradeClicked( self, buttonName )
 	print( "upgrade clicked" )
 	self.network:sendToServer("sv_n_tryUpgrade", sm.localPlayer.getPlayer() )
 end
 
-function GasEngine.cl_updateEffect( self, direction, active )
+function BioEngine.cl_updateEffect( self, direction, active )
 	local bearings = {}
 	local joints = self.interactable:getJoints()
 	for _, joint in ipairs( joints ) do
@@ -611,40 +582,33 @@ function GasEngine.cl_updateEffect( self, direction, active )
 	end
 end
 
-function GasEngine.sv_n_tryUpgrade( self, player )
+function BioEngine.sv_n_tryUpgrade( self, player )
 
 	local level = EngineLevels[tostring( self.shape:getShapeUuid() )]
 	if level and level.upgrade then
-		local function fnUpgrade()
-			local nextLevel = EngineLevels[level.upgrade]
-			assert( nextLevel )
-			self.gears = nextLevel.gears
-			self.network:sendToClients( "cl_n_onUpgrade", level.upgrade )
 
-			if nextLevel.fn then
-				nextLevel.fn( self )
-			end
+		local inventory = player:getInventory()
 
-			self.shape:replaceShape( sm.uuid.new( level.upgrade ) )
-		end
+		if sm.container.totalQuantity( inventory, obj_consumable_component ) >= level.cost then
 
-		if not sm.game.getEnableUpgradeCost() then
-			fnUpgrade()
-		else
-			local inventory = player:getInventory()
+			if sm.container.beginTransaction() then
+				sm.container.spend( inventory, obj_consumable_component, level.cost, true )
 
-			if sm.container.totalQuantity( inventory, obj_consumable_component ) >= level.cost then
+				if sm.container.endTransaction() then
+					local nextLevel = EngineLevels[level.upgrade]
+					assert( nextLevel )
+					self.gears = nextLevel.gears
+					self.network:sendToClients( "cl_n_onUpgrade", level.upgrade )
 
-				if sm.container.beginTransaction() then
-					sm.container.spend( inventory, obj_consumable_component, level.cost, true )
-
-					if sm.container.endTransaction() then
-						fnUpgrade()
+					if nextLevel.fn then
+						nextLevel.fn( self )
 					end
+
+					self.shape:replaceShape( sm.uuid.new( level.upgrade ) )
 				end
-			else
-				print( "Cannot afford upgrade" )
 			end
+		else
+			print( "Cannot afford upgrade" )
 		end
 	else
 		print( "Can't be upgraded" )
@@ -652,7 +616,7 @@ function GasEngine.sv_n_tryUpgrade( self, player )
 
 end
 
-function GasEngine.cl_n_onUpgrade( self, upgrade )
+function BioEngine.cl_n_onUpgrade( self, upgrade )
 	local level = EngineLevels[upgrade]
 	self.gears = level.gears
 	self.pointsPerFuel = level.pointsPerFuel
@@ -661,14 +625,11 @@ function GasEngine.cl_n_onUpgrade( self, upgrade )
 		self.gui:setIconImage( "Icon", sm.uuid.new( upgrade ) )
 
 		if level.cost then
-			if not sm.game.getEnableUpgradeCost() then
-				self.gui:setData( "Upgrade", { cost = level.cost, available = 1000 } )
-			else
-				local inventory = sm.localPlayer.getPlayer():getInventory()
-				local availableKits = sm.container.totalQuantity( inventory, obj_consumable_component )
-				local upgradeData = { cost = level.cost, available = availableKits }
-				self.gui:setData( "Upgrade", upgradeData )
-			end
+			local inventory = sm.localPlayer.getPlayer():getInventory()
+			local availableKits = sm.container.totalQuantity( inventory, obj_consumable_component )
+
+			local upgradeData = { cost = level.cost, available = availableKits }
+			self.gui:setData( "Upgrade", upgradeData )
 		else
 			self.gui:setVisible( "Upgrade", false )
 		end

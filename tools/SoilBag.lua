@@ -1,7 +1,7 @@
 dofile "$GAME_DATA/Scripts/game/AnimationUtil.lua"
 dofile "$SURVIVAL_DATA/Scripts/util.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_shapes.lua"
-dofile "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua"
+dofile "$SURVIVAL_DATA/Scripts/game/SurvivalGame.lua"													 
 
 SoilBag = class()
 
@@ -166,29 +166,59 @@ function SoilBag.client_onUpdate( self, dt )
 	
 end
 
-function SoilBag.constructionRayCast( self )
-
+-- /start Apollyon
+function SoilBag.constructionRayCast()
 	local valid, result = sm.localPlayer.getRaycast( 7.5 )
+	
 	if valid then
+		--print(result.type)
+	
+		local size = sm.vec3.new( 3, 3, 1 )
+		local size_2 = sm.vec3.new( 1, 1, 0 )
+		
 		if result.type == "terrainSurface" then
-
 			local groundPointOffset = -( sm.construction.constants.subdivideRatio_2 - 0.04 + sm.construction.constants.shapeSpacing + 0.005 )
 			local pointLocal = result.pointLocal + result.normalLocal * groundPointOffset
 
 			-- Compute grid pos
-			local size = sm.vec3.new( 3, 3, 1 )
-			local size_2 = sm.vec3.new( 1, 1, 0 )
 			local a = pointLocal * sm.construction.constants.subdivisions
 			local gridPos = sm.vec3.new( math.floor( a.x ), math.floor( a.y ), a.z ) - size_2
 
 			-- Compute world pos
 			local worldPos = gridPos * sm.construction.constants.subdivideRatio + ( size * sm.construction.constants.subdivideRatio ) * 0.5
-
+			
 			return valid, worldPos, result.normalWorld
+		
+		elseif result.type == "terrainAsset" then
+			local pointLocal = result.originWorld - sm.vec3.new( 0, 0, 0 ) + sm.localPlayer.getDirection() * 2
+			pointLocal.z = result.pointWorld.z - 0.15
+			
+			-- Compute grid pos
+			local a = pointLocal * 4
+			local gridPos = sm.vec3.new( math.floor( a.x ), math.floor( a.y ), a.z ) - size_2
+			
+			-- Compute world pos
+			local worldPos = gridPos * sm.construction.constants.subdivideRatio + ( size * sm.construction.constants.subdivideRatio ) * 0.5
+			
+			return valid, worldPos, sm.localPlayer.getDirection()
+		
+		elseif result.type == "body" then
+			local pointLocal = result.originWorld - sm.vec3.new( 0, 0, 0.0 ) + sm.localPlayer.getDirection() * 2
+			pointLocal.z = result.pointWorld.z - 0.15
+			
+			-- Compute grid pos
+			local a = pointLocal * 4
+			local gridPos = sm.vec3.new( math.floor( a.x ), math.floor( a.y ), a.z ) - size_2
+			
+			-- Compute world pos
+			local worldPos = gridPos * sm.construction.constants.subdivideRatio + ( size * sm.construction.constants.subdivideRatio ) * 0.5
+			
+			return valid, worldPos, sm.localPlayer.getDirection()
 		end
 	end
 	return false
 end
+-- /end Apollyon
 
 function SoilBag.client_onEquippedUpdate( self, primaryState, secondaryState, forceBuildActive )
 	if self.tool:isLocal() then
@@ -200,17 +230,19 @@ function SoilBag.client_onEquippedUpdate( self, primaryState, secondaryState, fo
 			return false, false
 		end
 		
-		local valid, worldPos, worldNormal = ConstructionRayCast( { "terrainSurface" } )
+		local valid, worldPos, worldNormal = self.constructionRayCast()
+		--local valid, worldPos, worldNormal = ConstructionRayCast( { "body" })
 		if valid then
 
 			self.effect:setPosition( worldPos )
 			self.effect:setRotation( sm.quat.angleAxis( math.pi*0.5, sm.vec3.new( 1, 0, 0 ) ) )
+			-- Apollyon: we do not want this
+			--if worldNormal.z < 0.97236992 then
+			--	sm.gui.setInteractionText( "#{INFO_TOO_STEEP}" )
+			--	self.effect:setParameter( "valid", false )
 
-			if worldNormal.z < 0.97236992 then
-				sm.gui.setInteractionText( "#{INFO_TOO_STEEP}" )
-				self.effect:setParameter( "valid", false )
-
-			elseif sm.physics.sphereContactCount( worldPos, 0.375, false, true ) > 0 then
+			--else
+			if sm.physics.sphereContactCount( worldPos, 0.00375, false, true ) > 0 then
 				self.effect:setParameter( "valid", false )
 
 			else
@@ -272,9 +304,9 @@ function SoilBag.sv_n_putSoil( self, params, player )
 	if not sm.game.getLimitedInventory() then
 		self:PlaceSoil( params, player )
 	else
-		sm.container.beginTransaction()
-		sm.container.spendFromSlot( player:getInventory(), params.slot, obj_consumable_soilbag, 1 )
-		if sm.container.endTransaction() then
+	sm.container.beginTransaction()
+	sm.container.spendFromSlot( player:getInventory(), params.slot, obj_consumable_soilbag, 1 )
+	if sm.container.endTransaction() then
 			self:PlaceSoil( params, player )
 		end
 	end
@@ -286,9 +318,8 @@ function SoilBag.PlaceSoil( self, params, player )
 	sm.effect.playEffect( "Plants - SoilbagUse", params.pos, nil, sm.quat.angleAxis( rot, sm.vec3.new( 0, 0, 1 ) ) * sm.quat.new( 0.70710678, 0, 0, 0.70710678 ) )
 	self.network:sendToClients( "cl_n_putSoil", params )
 end
-
 function SoilBag.cl_n_putSoil( self, params )
-	if not self.tool:isLocal() and self.tool:isEquipped() then
+	if not self.tool:isLocal() then
 		self:putSoil()
 	end
 end

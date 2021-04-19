@@ -28,18 +28,18 @@ local FastHpRecovery = 75 * PerMinute
 local FoodCostPerHpRecovery = 0.2
 local FastFoodCostPerHpRecovery = 0.2
 
-local FoodCostPerStamina = 0.01
-local WaterCostPerStamina = 0.01
-local SprintStaminaCost = 0.05 / 40 -- Per tick while sprinting
-local CarryStaminaCost = 0.08 / 40 -- Per tick while carrying
+local FoodCostPerStamina = 0.02
+local WaterCostPerStamina = 0.1
+local SprintStaminaCost = 0.7 / 40 -- Per tick while sprinting
+local CarryStaminaCost = 1.4 / 40 -- Per tick while carrying
 
-local FoodLostPerSecond = 50 / 3.5 / 24 / 60
-local WaterLostPerSecond = 50 / 2.5 / 24 / 60
+local FoodLostPerSecond = 100 / 3.5 / 24 / 60
+local WaterLostPerSecond = 100 / 2.5 / 24 / 60
 
-local BreathLostPerTick = ( 50 / 60 ) / 40
+local BreathLostPerTick = ( 100 / 60 ) / 40
 
-local FatigueDamageHp = 0.25 * PerSecond
-local FatigueDamageWater = 0.5 * PerSecond
+local FatigueDamageHp = 1 * PerSecond
+local FatigueDamageWater = 2 * PerSecond
 local FireDamage = 10
 local FireDamageCooldown = 40
 local DrownDamage = 5
@@ -374,19 +374,6 @@ function SurvivalPlayer.cl_localPlayerUpdate( self, dt )
 		self.cl.hungryEffect:setPosition( character.worldPosition )
 		self.cl.thirstyEffect:setPosition( character.worldPosition )
 		self:FantDisplay( character, dt )
-		
-		
-		
-		local ID = self.player:getId()
-		if g_Players[ID] ~= nil then
-			if g_Players[ID].jumpboost ~= nil then
-				if g_Players[ID].jumpboost >= 1 then
-					local Force = sm.vec3.new( 0, 0, Jump_Boost_Force )
-					sm.physics.applyImpulse( character, Force, true, sm.vec3.new( 0, 0, 0 ) )
-				end
-			end
-		end
-
 	end
 end
 
@@ -689,6 +676,17 @@ function SurvivalPlayer.server_onFixedUpdate( self, dt )
 						character.movementSpeedFraction = 20.0
 					end
 					self.sv.saved.stats.breath = self.sv.saved.stats.maxbreath
+				end
+			end
+		end
+		
+		local ID = self.player:getId()
+		if g_Players[ID] ~= nil then
+			if g_Players[ID].jumpboost ~= nil then
+				if g_Players[ID].jumpboost >= 1 then
+					local Force = sm.vec3.new( 0, 0, Jump_Boost_Force )
+
+					sm.physics.applyImpulse( character, Force, true, sm.vec3.new( 0, 0, 0 ) )
 				end
 			end
 		end

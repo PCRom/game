@@ -3,11 +3,13 @@
 dofile "$SURVIVAL_DATA/Scripts/game/survival_items.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/survival_survivalobjects.lua"
 dofile "$SURVIVAL_DATA/Scripts/game/util/pipes.lua"
+dofile "$SURVIVAL_DATA/Objects/Database/ShapeSets/craftbot.json"
 
 Crafter = class( nil )
 Crafter.colorNormal = sm.color.new( 0x84ff32ff )
 Crafter.colorHighlight = sm.color.new( 0xa7ff4fff )
-
+obj_craftbot_craftbot6 = sm.uuid.new( "c658151c-1434-4ff4-817a-12d381f4c6e8" )
+obj_craftbot_craftbot7 = sm.uuid.new( "12be421f-dd83-4274-a99e-96181d38dd71" )																			  
 local crafters = {
 	-- Workbench
 	[tostring( obj_survivalobject_workbench )] = {
@@ -103,6 +105,28 @@ local crafters = {
 			{ name = "craftbot", locked = false }
 		},
 		subTitle = "#{LEVEL} 5",
+		createGuiFunction = sm.gui.createCraftBotGui
+	},
+	-- Craftbot 6
+	[tostring( obj_craftbot_craftbot6 )] = {
+		needsPower = false,
+		slots = 8,
+		speed = 2,
+		recipeSets = {
+			{ name = "recyclebot", locked = false }
+		},
+		subTitle = "Recycle",
+		createGuiFunction = sm.gui.createCraftBotGui
+	},
+	-- Craftbot 7
+	[tostring( obj_craftbot_craftbot7 )] = {
+		needsPower = false,
+		slots = 8,
+		speed = 2,
+		recipeSets = {
+			{ name = "modbot", locked = false }
+		},
+		subTitle = "ModBot",
 		createGuiFunction = sm.gui.createCraftBotGui
 	}
 }
@@ -335,7 +359,7 @@ function Crafter.cl_init( self )
 	-- print( "craft_finish", self.interactable:getAnimDuration( "craft_finish" ) )
 
 
-	if shapeUuid == obj_craftbot_craftbot1 or shapeUuid == obj_craftbot_craftbot2 or shapeUuid == obj_craftbot_craftbot3 or shapeUuid == obj_craftbot_craftbot4 or shapeUuid == obj_craftbot_craftbot5  then
+	if shapeUuid == obj_craftbot_craftbot1 or shapeUuid == obj_craftbot_craftbot2 or shapeUuid == obj_craftbot_craftbot3 or shapeUuid == obj_craftbot_craftbot4 or shapeUuid == obj_craftbot_craftbot5 or shapeUuid == obj_craftbot_craftbot6  or shapeUuid == obj_craftbot_craftbot7 then
 		self.cl.mainEffects["unfold"] = sm.effect.createEffect( "Craftbot - Unpack", self.interactable )
 		self.cl.mainEffects["idle"] = sm.effect.createEffect( "Craftbot - Idle", self.interactable )
 		self.cl.mainEffects["idlespecial01"] = sm.effect.createEffect( "Craftbot - IdleSpecial01", self.interactable )
@@ -918,7 +942,7 @@ function Crafter.client_canInteract( self )
 end
 
 function Crafter.cl_setGuiContainers( self )
-	if isAnyOf( self.shape:getShapeUuid(), { obj_craftbot_craftbot1, obj_craftbot_craftbot2, obj_craftbot_craftbot3, obj_craftbot_craftbot4, obj_craftbot_craftbot5 } ) then
+	if isAnyOf( self.shape:getShapeUuid(), { obj_craftbot_craftbot1, obj_craftbot_craftbot2, obj_craftbot_craftbot3, obj_craftbot_craftbot4, obj_craftbot_craftbot5, obj_craftbot_craftbot6, obj_craftbot_craftbot7} ) then
 		local containers = {}
 		if #self.cl.pipeGraphs.input.containers > 0 then
 			for _, val in ipairs( self.cl.pipeGraphs.input.containers ) do
@@ -1035,6 +1059,7 @@ function Crafter.client_onInteract( self, character, state )
 
 		if self.crafter.upgrade then
 			local nextLevel = crafters[ self.crafter.upgrade ]
+
 			local upgradeInfo = {}
 			local nextLevelSlots = nextLevel.slots - self.crafter.slots
 			if nextLevelSlots > 0 then
@@ -1045,11 +1070,15 @@ function Crafter.client_onInteract( self, character, state )
 				upgradeInfo["Speed"] = nextLevelSpeed
 			end
 			self.cl.guiInterface:setData( "UpgradeInfo", upgradeInfo )
+
+																																	 
 		else
+																															  
 			self.cl.guiInterface:setData( "UpgradeInfo", nil )
 		end
 	end
 end
+   
 
 -- Gui callbacks
 
@@ -1242,6 +1271,9 @@ function Crafter.sv_n_upgrade( self, params, player )
 				sm.container.spend( player:getInventory(), obj_consumable_component, self.crafter.upgradeCost, true )
 				if sm.container.endTransaction() then
 					fnUpgrade()
+													  
+																																	
+																														  
 				end
 			end
 		else

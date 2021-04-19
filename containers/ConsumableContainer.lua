@@ -8,7 +8,6 @@ ConsumableContainer.maxChildCount = 255
 local ContainerSize = 5
 
 function ConsumableContainer.server_onCreate( self )
-
 	local container = self.shape.interactable:getContainer( 0 )
 	if not container then
 		container = self.shape:getInteractable():addContainer( 0, ContainerSize, self.data.stackSize )
@@ -49,7 +48,17 @@ function ConsumableContainer.client_onInteract( self, character, state )
 				
 			elseif shapeUuid == obj_container_gas then
 				gui = sm.gui.createGasContainerGui( true )
-				
+				gui:setVisible( "BioBackground", false )
+				gui:setVisible( "MainPanelBio", false )
+
+				--EDIT Biofuel Mod
+			elseif shapeUuid == obj_container_biofuel then
+				gui = sm.gui.createGasContainerGui( true )
+				gui:setVisible( "GasBackground", false )
+				gui:setVisible( "BioBackground", true )
+				gui:setVisible( "MainPanel", false )
+				gui:setVisible( "MainPanelBio", true )
+				--EDIT END Biofuel Mod
 			elseif shapeUuid == obj_container_seed then
 				gui = sm.gui.createSeedContainerGui( true )
 				
@@ -71,7 +80,7 @@ function ConsumableContainer.client_onInteract( self, character, state )
 end
 
 function ConsumableContainer.client_onUpdate( self, dt )
-	local parents = self.shape:getInteractable():getParents()
+local parents = self.shape:getInteractable():getParents()
 	local container = self.shape.interactable:getContainer( 0 )
 	if container then
 		local quantities = sm.container.quantity( container )
@@ -80,18 +89,18 @@ function ConsumableContainer.client_onUpdate( self, dt )
 		--print( parents )
 		if #parents > 0 then
 			--quantity = self.Air / 20
-		else
-			for _,q in ipairs(quantities) do
-				quantity = quantity + q
-			end
+		else					
+		for _,q in ipairs(quantities) do
+			quantity = quantity + q
 		end
+	end
 		local frame = ContainerSize - math.ceil( quantity / self.data.stackSize )
 		self.interactable:setUvFrameIndex( frame )
 	end
 end	
 
 SeedContainer = class( ConsumableContainer )
-SeedContainer.connectionOutput = sm.interactable.connectionType.water  
+SeedContainer.connectionOutput = sm.interactable.connectionType.water
 SeedContainer.colorNormal = sm.color.new( 0x84ff32ff )
 SeedContainer.colorHighlight = sm.color.new( 0xa7ff4fff )
 
@@ -112,15 +121,13 @@ FertilizerContainer = class( ConsumableContainer )
 FertilizerContainer.connectionOutput = sm.interactable.connectionType.water  
 FertilizerContainer.colorNormal = sm.color.new( 0x84ff32ff )
 FertilizerContainer.colorHighlight = sm.color.new( 0xa7ff4fff )
-
-
+		  
 WaterContainer = class( ConsumableContainer )
 WaterContainer.maxParentCount = 1
-WaterContainer.connectionInput = sm.interactable.connectionType.power  
+WaterContainer.connectionInput = sm.interactable.connectionType.power													   
 WaterContainer.connectionOutput = sm.interactable.connectionType.water
 WaterContainer.colorNormal = sm.color.new( 0x84ff32ff )
 WaterContainer.colorHighlight = sm.color.new( 0xa7ff4fff )
-
 WaterContainer.Air = 0
 WaterContainer.LastAir = 0
 WaterContainer.AirRefrehRate = 10
@@ -164,7 +171,7 @@ function WaterContainer.server_onFixedUpdate( self, timeStep )
 				if  self.Air < 0 then
 					self.Air = 0
 				end
-				 self.seatedCharacter = parent.shape:getInteractable():getSeatCharacter()
+				self.seatedCharacter = parent.shape:getInteractable():getSeatCharacter()
 				if self.seatedCharacter then
 					sm.event.sendToPlayer( self.seatedCharacter:getPlayer(), "sv_e_debug", { breath = 100 } )
 				end
@@ -241,6 +248,13 @@ GasolineContainer.connectionOutput = sm.interactable.connectionType.gasoline
 GasolineContainer.colorNormal = sm.color.new( 0x84ff32ff )
 GasolineContainer.colorHighlight = sm.color.new( 0xa7ff4fff )
 
+--EDIT Biofuel Mod
+BiofuelContainer = class( ConsumableContainer )
+BiofuelContainer.connectionOutput = sm.interactable.connectionType.gasoline + sm.interactable.connectionType.gasoline
+BiofuelContainer.colorNormal = sm.color.new( 0x84ff32ff )
+BiofuelContainer.colorHighlight = sm.color.new( 0xa7ff4fff )
+--EDIT END Biofuel Mod
+
 AmmoContainer = class( ConsumableContainer )
 AmmoContainer.connectionOutput = sm.interactable.connectionType.ammo
 AmmoContainer.colorNormal = sm.color.new( 0x84ff32ff )
@@ -266,9 +280,9 @@ local FoodUuids = {
 	obj_resource_steak,
 	obj_resource_corn,
 	obj_consumable_fant_redwoc,
-	obj_consumable_fant_steak,
+	obj_consumable_fant_steak,							
 	obj_consumable_fant_totebots,
-	obj_consumable_fant_fries
+	obj_consumable_fant_fries						
 }
 
 function FoodContainer.server_onCreate( self )
@@ -318,4 +332,3 @@ function ExplosiveAmmoContainer.client_onUpdate( self, dt )
 		self.interactable:setUvFrameIndex( frame )
 	end
 end	
-
