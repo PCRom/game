@@ -25,21 +25,21 @@ local FoodRecoveryThreshold = 5 -- Recover hp when food is above this value
 local FastFoodRecoveryThreshold = 50 -- Recover hp fast when food is above this value
 local HpRecovery = 50 * PerMinute
 local FastHpRecovery = 75 * PerMinute
-local FoodCostPerHpRecovery = 0.2
-local FastFoodCostPerHpRecovery = 0.2
+local FoodCostPerHpRecovery = 0.1
+local FastFoodCostPerHpRecovery = 0.05
 
 local FoodCostPerStamina = 0.02
-local WaterCostPerStamina = 0.1
-local SprintStaminaCost = 0.7 / 40 -- Per tick while sprinting
-local CarryStaminaCost = 1.4 / 40 -- Per tick while carrying
+local WaterCostPerStamina = 0.01
+local SprintStaminaCost = 0.05 / 40 -- Per tick while sprinting
+local CarryStaminaCost = 0.5 / 40 -- Per tick while carrying
 
-local FoodLostPerSecond = 100 / 3.5 / 24 / 60
-local WaterLostPerSecond = 100 / 2.5 / 24 / 60
+local FoodLostPerSecond = 50 / 3.5 / 24 / 60
+local WaterLostPerSecond = 50 / 2.5 / 24 / 60
 
-local BreathLostPerTick = ( 100 / 60 ) / 40
+local BreathLostPerTick = ( 50 / 60 ) / 40
 
-local FatigueDamageHp = 1 * PerSecond
-local FatigueDamageWater = 2 * PerSecond
+local FatigueDamageHp = 0.5 * PerSecond
+local FatigueDamageWater = 0.75 * PerSecond
 local FireDamage = 10
 local FireDamageCooldown = 40
 local DrownDamage = 5
@@ -1117,9 +1117,9 @@ function SurvivalPlayer.sv_onSpawnCharacter( self )
 			self.sv.saved.stats.jumpboost = 0
 			self.sv.saved.stats.refinebuff = 0
 		else
-			self.sv.saved.stats.hp = 30
-			self.sv.saved.stats.food = 30
-			self.sv.saved.stats.water = 30
+			self.sv.saved.stats.hp = self.sv.saved.stats.maxhp
+			self.sv.saved.stats.food = self.sv.saved.stats.maxfood
+			self.sv.saved.stats.water = self.sv.saved.stats.maxwater
 			self.sv.saved.stats.speed = 0
 			self.sv.saved.stats.damagebuff = 0
 			self.sv.saved.stats.jumpboost = 0
